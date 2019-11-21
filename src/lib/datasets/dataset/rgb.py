@@ -63,8 +63,6 @@ class RGB(data.Dataset):
         [-0.5832747, 0.00994535, -0.81221408],
         [-0.56089297, 0.71832671, 0.41158938]
     ], dtype=np.float32)
-    # self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
-    # self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
 
     self.split = split
     self.opt = opt
@@ -80,7 +78,6 @@ class RGB(data.Dataset):
     return float("{:.2f}".format(x))
 
   def convert_eval_format(self, all_bboxes):
-    # import pdb; pdb.set_trace()
     detections = []
     for image_id in all_bboxes:
       for cls_ind in all_bboxes[image_id]:
@@ -111,9 +108,6 @@ class RGB(data.Dataset):
                 open('{}/results.json'.format(save_dir), 'w'))
   
   def run_eval(self, results, save_dir):
-    # result_json = os.path.join(save_dir, "results.json")
-    # detections  = self.convert_eval_format(results)
-    # json.dump(detections, open(result_json, "w"))
     self.save_results(results, save_dir)
     coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
     coco_eval = COCOeval(self.coco, coco_dets, "bbox")

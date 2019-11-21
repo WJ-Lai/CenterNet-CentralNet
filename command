@@ -69,3 +69,7 @@ sensor="nir" && python demo.py ctdet --demo /home/vincent/Code/CenterNet-cuda10-
 
 sensor="rgb" && python demo.py ctdet --demo /home/vincent/Code/CenterNet-cuda10-multi-spectral/data/$sensor/images --dataset $sensor --load_model /home/vincent/Code/CenterNet-cuda10-multi-spectral/exp/ctdet/coco_dla/$sensor/model_best.pth --dataset $sensor
 
+
+
+--exp_id 实验名称
+--fuse 选择不同的传感器

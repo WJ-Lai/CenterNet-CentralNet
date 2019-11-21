@@ -17,7 +17,6 @@ class opts(object):
                              help='ctdet | ddd | multi_pose | exdet')
     self.parser.add_argument('--dataset', default='rgb',
                              help='coco | kitti | coco_hp | pascal | voc | rgb | fir | mir | nir | fusion')
-
     self.parser.add_argument('--sensor1', default='rgb')
     self.parser.add_argument('--sensor2', default='rgb')
 
@@ -231,11 +230,22 @@ class opts(object):
     self.parser.add_argument('--eval_oracle_dep', action='store_true', 
                              help='use ground truth depth.')
 
+    # CenterNet-CentralNet-Add
+    self.parser.add_argument('--data_dir', default='/home/vincent/Code/CenterNet-cuda10-multi-spectral/data',
+                             help='path of data dir like: xxx/data')
+    self.parser.add_argument('--exp_dir', default='/home/vincent/Checkpoint/CenterNet-CentralNet',
+                             help='path to save exp data')
+    self.parser.add_argument('--fuse', type=str, default='',
+                             help='types of sensors which to fuse')
+
   def parse(self, args=''):
     if args == '':
       opt = self.parser.parse_args()
     else:
       opt = self.parser.parse_args(args)
+
+    # fuse
+    opt.fuse = [str(sensor) for sensor in opt.fuse.split(',')]
 
     opt.gpus_str = opt.gpus
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
@@ -276,9 +286,8 @@ class opts(object):
     print('training chunk_sizes:', opt.chunk_sizes)
 
     opt.root_dir = os.path.join(os.path.dirname(__file__), '..', '..')
-    opt.data_dir = os.path.join(opt.root_dir, 'data')
-    opt.exp_dir = os.path.join(opt.root_dir, 'exp', opt.task)
-    opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id, opt.dataset)
+    opt.exp_dir = os.path.join(opt.exp_dir, opt.task)
+    opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)
     opt.debug_dir = os.path.join(opt.save_dir, 'debug')
     print('The output will be saved to ', opt.save_dir)
     
