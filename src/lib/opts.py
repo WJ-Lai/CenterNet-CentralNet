@@ -15,7 +15,7 @@ class opts(object):
     # basic experiment setting
     self.parser.add_argument('--task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet')
-    self.parser.add_argument('--dataset', default='rgb',
+    self.parser.add_argument('--dataset', default='rgb,fir',
                              help='coco | kitti | coco_hp | pascal | voc | rgb | fir | mir | nir | fusion')
     self.parser.add_argument('--sensor1', default='rgb')
     self.parser.add_argument('--sensor2', default='rgb')
@@ -67,7 +67,7 @@ class opts(object):
     self.parser.add_argument('--arch', default='hourglass',
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
-                                  'dlav0_34 | dla_34 | hourglass')
+                                  'dlav0_34 | dla_34 | hourglass | hourglassfusion')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
@@ -98,7 +98,7 @@ class opts(object):
                              help='batch size on the master gpu.')
     self.parser.add_argument('--num_iters', type=int, default=-1,
                              help='default: #samples / batch_size.')
-    self.parser.add_argument('--val_intervals', type=int, default=5,
+    self.parser.add_argument('--val_intervals', type=int, default=1,
                              help='number of epochs to run validation.')
     self.parser.add_argument('--trainval', action='store_true',
                              help='include validation in training and '
@@ -235,8 +235,6 @@ class opts(object):
                              help='path of data dir like: xxx/data')
     self.parser.add_argument('--exp_dir', default='/home/vincent/Checkpoint/CenterNet-CentralNet',
                              help='path to save exp data')
-    self.parser.add_argument('--fuse', type=str, default='',
-                             help='types of sensors which to fuse')
 
   def parse(self, args=''):
     if args == '':
@@ -245,7 +243,7 @@ class opts(object):
       opt = self.parser.parse_args(args)
 
     # fuse
-    opt.fuse = [str(sensor) for sensor in opt.fuse.split(',')]
+    opt.dataset = [str(sensor) for sensor in opt.dataset.split(',')]
 
     opt.gpus_str = opt.gpus
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
@@ -262,8 +260,8 @@ class opts(object):
 
     if opt.head_conv == -1: # init default head_conv
       opt.head_conv = 256 if 'dla' in opt.arch else 64
-    opt.pad = 127 if 'hourglass' in opt.arch else 31
-    opt.num_stacks = 2 if opt.arch == 'hourglass' else 1
+    opt.pad = 127 if 'hourglass' or 'hourglassfusion' in opt.arch else 31
+    opt.num_stacks = 2 if opt.arch == 'hourglass' or opt.arch == 'hourglassfusion' else 1
 
     if opt.trainval:
       opt.val_intervals = 100000000

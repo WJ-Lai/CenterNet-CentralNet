@@ -208,8 +208,8 @@ class BaseTrainer(object):
   def _get_losses(self, opt):
     raise NotImplementedError
   
-  def val(self, epoch, data_loader):
-    return self.run_epoch('val', epoch, data_loader)
+  def val(self, epoch, data_loader, data_loader2):
+    return self.run_epoch_fusion('val', epoch, data_loader, data_loader2)
 
   def train(self, epoch, data_loader):
     return self.run_epoch('train', epoch, data_loader)

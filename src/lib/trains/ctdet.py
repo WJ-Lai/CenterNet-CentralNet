@@ -18,6 +18,13 @@ class CtdetLoss(torch.nn.Module):
   def __init__(self, opt):
     super(CtdetLoss, self).__init__()
     self.crit = torch.nn.MSELoss() if opt.mse_loss else FocalLoss()
+
+    self.crit_bike = torch.nn.MSELoss() if opt.mse_loss else FocalLoss()
+    self.crit_car = torch.nn.MSELoss() if opt.mse_loss else FocalLoss()
+    self.crit_color_cone = torch.nn.MSELoss() if opt.mse_loss else FocalLoss()
+    self.crit_person = torch.nn.MSELoss() if opt.mse_loss else FocalLoss()
+
+
     self.crit_reg = RegL1Loss() if opt.reg_loss == 'l1' else \
               RegLoss() if opt.reg_loss == 'sl1' else None
     self.crit_wh = torch.nn.L1Loss(reduction='sum') if opt.dense_wh else \
@@ -28,6 +35,9 @@ class CtdetLoss(torch.nn.Module):
   def forward(self, outputs, batch):
     opt = self.opt
     hm_loss, wh_loss, off_loss = 0, 0, 0
+
+    hm_loss_bike, hm_loss_car, hm_loss_color_cone, hm_loss_person = 0, 0, 0, 0
+
     for s in range(opt.num_stacks):
       output = outputs[s]
       if not opt.mse_loss:
@@ -47,12 +57,64 @@ class CtdetLoss(torch.nn.Module):
           output['reg'].shape[3], output['reg'].shape[2])).to(opt.device)
 
       hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
+
+      # print('hm_loss: %s' % str(hm_loss.item()))
+      # print('hm_loss: %s' % str(hm_loss))
+      # hm_loss = self.crit(output['hm'], batch['hm']) / opt.num_stacks
+      # print('hm_loss: %s' % str(hm_loss.item()))
+      # print('hm_loss: %s' % str(hm_loss))
+
+      # print('')
+      # hm_loss_bike = self.crit(output['hm'][0,:,:,:], batch['hm'][0,:,:,:]) / opt.num_stacks
+      # hm_loss_car = self.crit(output['hm'][1,:,:,:], batch['hm'][1,:,:,:]) / opt.num_stacks
+      # hm_loss_color_cone = self.crit(output['hm'][2,:,:,:], batch['hm'][2,:,:,:]) / opt.num_stacks
+      # hm_loss_person = self.crit(output['hm'][3,:,:,:], batch['hm'][3,:,:,:]) / opt.num_stacks
+      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
+      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
+      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
+      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
+      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()/4))
+      #
+      # print('')
+      # hm_loss_bike += self.crit(output['hm'][:,0,:,:], batch['hm'][:,0,:,:]) / opt.num_stacks
+      # hm_loss_car += self.crit(output['hm'][:,1,:,:], batch['hm'][:,1,:,:]) / opt.num_stacks
+      # hm_loss_color_cone += self.crit(output['hm'][:,2,:,:], batch['hm'][:,2,:,:]) / opt.num_stacks
+      # hm_loss_person += self.crit(output['hm'][:,3,:,:], batch['hm'][:,3,:,:]) / opt.num_stacks
+      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
+      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
+      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
+      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
+      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()))
+      #
+      # print('')
+      # hm_loss_bike += self.crit(output['hm'][:,:,0,:], batch['hm'][:,:,0,:]) / opt.num_stacks
+      # hm_loss_car += self.crit(output['hm'][:,:,1,:], batch['hm'][:,:,1,:]) / opt.num_stacks
+      # hm_loss_color_cone += self.crit(output['hm'][:,:,2,:], batch['hm'][:,:,2,:]) / opt.num_stacks
+      # hm_loss_person += self.crit(output['hm'][:,:,3,:], batch['hm'][:,:,3,:]) / opt.num_stacks
+      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
+      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
+      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
+      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
+      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()))
+      #
+      # print('')
+      # hm_loss_bike += self.crit(output['hm'][:,:,:,0], batch['hm'][:,:,:,0]) / opt.num_stacks
+      # hm_loss_car += self.crit(output['hm'][:,:,:,1], batch['hm'][:,:,:,1]) / opt.num_stacks
+      # hm_loss_color_cone += self.crit(output['hm'][:,:,:,2], batch['hm'][:,:,:,2]) / opt.num_stacks
+      # hm_loss_person += self.crit(output['hm'][:,:,:,3], batch['hm'][:,:,:,3]) / opt.num_stacks
+      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
+      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
+      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
+      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
+      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()))
+
+
       if opt.wh_weight > 0:
         if opt.dense_wh:
           mask_weight = batch['dense_wh_mask'].sum() + 1e-4
           wh_loss += (
             self.crit_wh(output['wh'] * batch['dense_wh_mask'],
-            batch['dense_wh'] * batch['dense_wh_mask']) / 
+            batch['dense_wh'] * batch['dense_wh_mask']) /
             mask_weight) / opt.num_stacks
         elif opt.cat_spec_wh:
           wh_loss += self.crit_wh(

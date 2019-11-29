@@ -15,8 +15,6 @@ from logger import Logger
 from datasets.dataset_factory import get_dataset
 from trains.train_factory import train_factory
 
-# from tensorboardX import SummaryWriter
-
 
 def print_weight(model, doc):
     print('mergeuplayer', file=doc)
@@ -24,7 +22,7 @@ def print_weight(model, doc):
     print(model._modules['mergeuplayer'].alpha2.data, file=doc)
     print(model._modules['mergeuplayer'].alpha3.data, file=doc)
     print('', file=doc)
-    print('mergeup_pre', file=doc)
+    print('mergeup_pre')
     print(model._modules['mergeup_pre'].alpha1.data, file=doc)
     print(model._modules['mergeup_pre'].alpha2.data, file=doc)
     print(model._modules['mergeup_pre'].alpha3.data, file=doc)
@@ -49,25 +47,16 @@ def print_weight(model, doc):
     print(model._modules['mergeup_head']._modules['1'].alpha3.data, file=doc)
     print('', file=doc)
 
-class ConcatDataset(torch.utils.data.Dataset):
-    def __init__(self, *datasets):
-        self.datasets = datasets
-
-    def __getitem__(self, i):
-        return tuple(d[i] for d in self.datasets)
-
-    def __len__(self):
-        return min(len(d) for d in self.datasets)
-
 def main(opt):
-  # writer = SummaryWriter('../logs')
+
 
   torch.manual_seed(opt.seed)
   torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
 
-  # for fusion-----create new train loader
-  Dataset2 = get_dataset('fir', opt.task)
-  opt2 = opts().update_dataset_info_and_set_heads(opt, Dataset2)
+  print('Using sensors:' % opt.dataset)
+  names = locals()
+  for idx, sensor in enumerate(opt.dataset):
+    names['Dataset'+str(idx)] = get_dataset(sensor, opt.task)
 
   Dataset = get_dataset('rgb', opt.task)
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
@@ -77,6 +66,9 @@ def main(opt):
 
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.device = torch.device('cuda' if opt.gpus[0] >= 0 else 'cpu')
+
+  a = Dataset(opt, 'train')
+
   os.environ['CUDA_VISIBLE_DEVICES'] = opt2.gpus_str
   opt2.device = opt.device
 
@@ -96,11 +88,6 @@ def main(opt):
       k = k + l
   print("总参数数量和：" + str(k))
 
-  # print(model)
-  # doc = open('para_out.txt', 'w+')
-  # for i in model.named_parameters():
-  #     print(i, file=doc)
-  # doc.close()
   optimizer = torch.optim.Adam(model.parameters(), opt.lr)
   start_epoch = 0
   if opt.load_model != '':
@@ -111,17 +98,12 @@ def main(opt):
   trainer = Trainer(opt, model, optimizer)
   trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
 
+
+
   print('Setting up data...')
   val_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'val'), 
       batch_size=1, 
-      shuffle=False,
-      num_workers=1,
-      pin_memory=True
-  )
-  val_loader2 = torch.utils.data.DataLoader(
-      Dataset2(opt, 'val'),
-      batch_size=1,
       shuffle=False,
       num_workers=1,
       pin_memory=True
@@ -131,6 +113,7 @@ def main(opt):
     _, preds = trainer.val(0, val_loader)
     val_loader.dataset.run_eval(preds, opt.save_dir)
     return
+
 
   train_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'train'),
@@ -167,7 +150,7 @@ def main(opt):
       save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)), 
                  epoch, model, optimizer)
       with torch.no_grad():
-        log_dict_val, preds = trainer.val(epoch, val_loader, val_loader2)
+        log_dict_val, preds = trainer.val(epoch, val_loader)
       for k, v in log_dict_val.items():
         logger.scalar_summary('val_{}'.format(k), v, epoch)
         logger.write('{} {:8f} | '.format(k, v))

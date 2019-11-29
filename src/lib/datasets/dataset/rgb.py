@@ -33,7 +33,7 @@ class RGB(data.Dataset):
       if opt.task == 'exdet':
         self.annot_path = os.path.join(
           self.data_dir, 'annotations', 
-          'train.json')
+          'val.json')
       if split == 'test':
         self.annot_path = os.path.join(
           self.data_dir, 'annotations',
@@ -41,8 +41,8 @@ class RGB(data.Dataset):
       else:
         self.annot_path = os.path.join(
           self.data_dir, 'annotations', 
-          'train.json')
-    self.max_objs = 128
+          'val.json')
+    self.max_objs = 100
     if len(cf.label)==5:
       self.class_name = [
         '__background__', 'bike', 'car', 'car_stop', 'color_cone', 'person']

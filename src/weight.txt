@@ -1,0 +1,28 @@
+mergeuplayer
+tensor([1.], device='cuda:0')
+tensor([1.], device='cuda:0')
+tensor([1.], device='cuda:0')
+
+tensor([1.0009], device='cuda:0')
+tensor([0.9991], device='cuda:0')
+tensor([1.], device='cuda:0')
+
+mergeup_kp_0
+tensor([0.9992], device='cuda:0')
+tensor([1.0007], device='cuda:0')
+tensor([1.0004], device='cuda:0')
+
+mergeup_kp_1
+tensor([1.0016], device='cuda:0')
+tensor([0.9985], device='cuda:0')
+tensor([0.9995], device='cuda:0')
+
+mergeup_head_0
+tensor([0.9930], device='cuda:0')
+tensor([0.9935], device='cuda:0')
+tensor([0.9931], device='cuda:0')
+mergeup_head_1
+tensor([0.9945], device='cuda:0')
+tensor([0.9943], device='cuda:0')
+tensor([0.9943], device='cuda:0')
+

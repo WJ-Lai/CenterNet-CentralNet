@@ -15,10 +15,7 @@ from logger import Logger
 from datasets.dataset_factory import get_dataset
 from trains.train_factory import train_factory
 
-# from tensorboardX import SummaryWriter
-
 def main(opt):
-  # writer = SummaryWriter('../logs')
 
   torch.manual_seed(opt.seed)
   torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test

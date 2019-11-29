@@ -582,13 +582,9 @@ class exkp(nn.Module):
 class WeightMergeUp(nn.Module):
     def __init__(self):
         super(WeightMergeUp, self).__init__()
-        self.alpha1 = torch.Tensor([1]).cuda()
-        self.alpha2 = torch.Tensor([1]).cuda()
-        self.alpha3 = torch.Tensor([1]).cuda()
-
-        # self.alpha1 = torch.ones((1), requires_grad=True).cuda()
-        # self.alpha2 = torch.ones((1), requires_grad=True).cuda()
-        # self.alpha3 = torch.ones((1), requires_grad=True).cuda()
+        self.alpha1 = torch.nn.Parameter(torch.Tensor([1.]).cuda())
+        self.alpha2 = torch.nn.Parameter(torch.Tensor([1.]).cuda())
+        self.alpha3 = torch.nn.Parameter(torch.Tensor([1.]).cuda())
 
     def forward(self, *up):
         if len(up)==2:

@@ -33,7 +33,7 @@ class FIR(data.Dataset):
       if opt.task == 'exdet':
         self.annot_path = os.path.join(
           self.data_dir, 'annotations', 
-          'train.json')
+          'val.json')
       if split == 'test':
         self.annot_path = os.path.join(
           self.data_dir, 'annotations',
@@ -41,7 +41,7 @@ class FIR(data.Dataset):
       else:
         self.annot_path = os.path.join(
           self.data_dir, 'annotations', 
-          'train.json')
+          'val.json')
     self.max_objs = 128
     if len(cf.label)==5:
       self.class_name = [
