@@ -51,7 +51,8 @@ class BaseTrainer(object):
     self, opt, model, optimizer=None):
     self.opt = opt
     self.optimizer = optimizer
-    self.loss_stats, self.loss = self._get_losses(opt)
+    # self.loss_stats, self.loss = self._get_losses(opt)
+    self.loss_stats, self.loss = self.get_losses_detail(opt)
     if model._name == 'fusion':
       self.model_with_loss = ModleWithLoss_fusion(model, self.loss)
     else:

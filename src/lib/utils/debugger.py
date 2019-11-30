@@ -46,7 +46,7 @@ class Debugger(object):
       self.names = coco_class_name
     elif num_classes == 6 or dataset == 'voc':
       self.names = voc_class_name
-    elif num_classes == len(cf.label) or dataset == 'rgb' or dataset == 'fir' \
+    elif num_classes == len(cf.categories) or dataset == 'rgb' or dataset == 'fir' \
             or dataset == 'mir' or dataset == 'nir':
       self.names = MSODD_class_name
     elif num_classes == 20 or dataset == 'pascal':
@@ -464,7 +464,7 @@ coco_class_name = [
 
 voc_class_name = ['aeroplane', 'bottle', 'chair', 'dog', 'person', 'tvmonitor']
 
-MSODD_class_name = cf.label
+MSODD_class_name = cf.categories
 
 color_list = np.array(
         [

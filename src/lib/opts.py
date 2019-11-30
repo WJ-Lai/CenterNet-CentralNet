@@ -245,6 +245,7 @@ class opts(object):
     # fuse
     opt.dataset = [str(sensor) for sensor in opt.dataset.split(',')]
 
+
     opt.gpus_str = opt.gpus
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
     opt.gpus = [i for i in range(len(opt.gpus))] if opt.gpus[0] >=0 else [-1]

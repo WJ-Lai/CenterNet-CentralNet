@@ -5,8 +5,8 @@ opt = opts().parse()
 sensor = opt.dataset
 print('################## Dataset about %s ##################' % sensor)
 
-# label = ['bike', 'car', 'car_stop', 'color_cone', 'person']
-label = ['bike', 'car', 'color_cone', 'person']
+# categories = ['bike', 'car', 'car_stop', 'color_cone', 'person']
+categories = ['bike', 'car', 'color_cone', 'person']
 main_path = '/home/vincent/Code/CenterNet-cuda10-multi-spectral'
 # images_save_path = os.path.join(main_path, 'exp/output_images/', sensor)
 images_save_path = os.path.join('/home/vincent/20191117')
@@ -25,7 +25,7 @@ mir_std = [0.195073, 0.195073, 0.195073]
 nir_mean = [0.115349, 0.115349, 0.115349]
 nir_std = [0.174036, 0.174036, 0.174036]
 
-own_dataset_num_classes = len(label)
+own_dataset_num_classes = len(categories)
 default_dataset = sensor
 
 default_mean = {'rgb':rgb_mean, 'fir':fir_mean, 'mir':mir_mean, 'nir':nir_mean}

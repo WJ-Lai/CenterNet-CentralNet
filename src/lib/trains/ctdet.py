@@ -13,6 +13,7 @@ from utils.debugger import Debugger
 from utils.post_process import ctdet_post_process
 from utils.oracle_utils import gen_oracle_map
 from .base_trainer import BaseTrainer
+import config as cf
 
 class CtdetLoss(torch.nn.Module):
   def __init__(self, opt):
@@ -58,56 +59,14 @@ class CtdetLoss(torch.nn.Module):
 
       hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
 
-      # print('hm_loss: %s' % str(hm_loss.item()))
-      # print('hm_loss: %s' % str(hm_loss))
-      # hm_loss = self.crit(output['hm'], batch['hm']) / opt.num_stacks
-      # print('hm_loss: %s' % str(hm_loss.item()))
-      # print('hm_loss: %s' % str(hm_loss))
+      hm_loss_categorie = {}
+      for i, categorie in enumerate(cf.categories):
+        hm_loss_categorie[categorie] = self.crit(output['hm'][:,i,:,:], batch['hm'][:,i,:,:]) / opt.num_stacks
 
-      # print('')
-      # hm_loss_bike = self.crit(output['hm'][0,:,:,:], batch['hm'][0,:,:,:]) / opt.num_stacks
-      # hm_loss_car = self.crit(output['hm'][1,:,:,:], batch['hm'][1,:,:,:]) / opt.num_stacks
-      # hm_loss_color_cone = self.crit(output['hm'][2,:,:,:], batch['hm'][2,:,:,:]) / opt.num_stacks
-      # hm_loss_person = self.crit(output['hm'][3,:,:,:], batch['hm'][3,:,:,:]) / opt.num_stacks
-      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
-      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
-      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
-      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
-      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()/4))
-      #
-      # print('')
       # hm_loss_bike += self.crit(output['hm'][:,0,:,:], batch['hm'][:,0,:,:]) / opt.num_stacks
       # hm_loss_car += self.crit(output['hm'][:,1,:,:], batch['hm'][:,1,:,:]) / opt.num_stacks
       # hm_loss_color_cone += self.crit(output['hm'][:,2,:,:], batch['hm'][:,2,:,:]) / opt.num_stacks
       # hm_loss_person += self.crit(output['hm'][:,3,:,:], batch['hm'][:,3,:,:]) / opt.num_stacks
-      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
-      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
-      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
-      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
-      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()))
-      #
-      # print('')
-      # hm_loss_bike += self.crit(output['hm'][:,:,0,:], batch['hm'][:,:,0,:]) / opt.num_stacks
-      # hm_loss_car += self.crit(output['hm'][:,:,1,:], batch['hm'][:,:,1,:]) / opt.num_stacks
-      # hm_loss_color_cone += self.crit(output['hm'][:,:,2,:], batch['hm'][:,:,2,:]) / opt.num_stacks
-      # hm_loss_person += self.crit(output['hm'][:,:,3,:], batch['hm'][:,:,3,:]) / opt.num_stacks
-      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
-      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
-      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
-      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
-      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()))
-      #
-      # print('')
-      # hm_loss_bike += self.crit(output['hm'][:,:,:,0], batch['hm'][:,:,:,0]) / opt.num_stacks
-      # hm_loss_car += self.crit(output['hm'][:,:,:,1], batch['hm'][:,:,:,1]) / opt.num_stacks
-      # hm_loss_color_cone += self.crit(output['hm'][:,:,:,2], batch['hm'][:,:,:,2]) / opt.num_stacks
-      # hm_loss_person += self.crit(output['hm'][:,:,:,3], batch['hm'][:,:,:,3]) / opt.num_stacks
-      # print('hm_loss_bike: %s' % str(hm_loss_bike.item()))
-      # print('hm_loss_car: %s' % str(hm_loss_car.item()))
-      # print('hm_loss_color_cone: %s' % str(hm_loss_color_cone.item()))
-      # print('hm_loss_person: %s' % str(hm_loss_person.item()))
-      # print('所有种类相加: %s' % str((hm_loss_bike+hm_loss_car+hm_loss_color_cone+hm_loss_person).item()))
-
 
       if opt.wh_weight > 0:
         if opt.dense_wh:
@@ -133,6 +92,10 @@ class CtdetLoss(torch.nn.Module):
            opt.off_weight * off_loss
     loss_stats = {'loss': loss, 'hm_loss': hm_loss,
                   'wh_loss': wh_loss, 'off_loss': off_loss}
+
+    for cat_name, cat_loss in hm_loss_categorie.items():
+      loss_stats.update({'hm_loss_'+cat_name: cat_loss})
+
     return loss, loss_stats
 
 class CtdetTrainer(BaseTrainer):
@@ -141,6 +104,12 @@ class CtdetTrainer(BaseTrainer):
   
   def _get_losses(self, opt):
     loss_states = ['loss', 'hm_loss', 'wh_loss', 'off_loss']
+    loss = CtdetLoss(opt)
+    return loss_states, loss
+
+  def get_losses_detail(self, opt):
+    loss_states = ['loss', 'hm_loss', 'wh_loss', 'off_loss']
+    loss_states += ['hm_loss_'+c for c in cf.categories]
     loss = CtdetLoss(opt)
     return loss_states, loss
 

@@ -43,7 +43,7 @@ class MIR(data.Dataset):
           self.data_dir, 'annotations',
           'train.json')
     self.max_objs = 128
-    if len(cf.label)==5:
+    if len(cf.categories)==5:
       self.class_name = [
         '__background__', 'bike', 'car', 'car_stop', 'color_cone', 'person']
       self._valid_ids = [0, 1, 2, 3, 4, 5]
