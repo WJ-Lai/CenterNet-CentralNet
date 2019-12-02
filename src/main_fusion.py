@@ -96,11 +96,6 @@ def main(opt):
       k = k + l
   print("总参数数量和：" + str(k))
 
-  # print(model)
-  # doc = open('para_out.txt', 'w+')
-  # for i in model.named_parameters():
-  #     print(i, file=doc)
-  # doc.close()
   optimizer = torch.optim.Adam(model.parameters(), opt.lr)
   start_epoch = 0
   if opt.load_model != '':
