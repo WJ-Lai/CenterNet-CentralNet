@@ -66,10 +66,10 @@ def main(opt):
   torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
 
   # for fusion-----create new train loader
-  Dataset2 = get_dataset('fir', opt.task)
+  Dataset2 = get_dataset(opt.dataset[0], opt.task)
   opt2 = opts().update_dataset_info_and_set_heads(opt, Dataset2)
 
-  Dataset = get_dataset('rgb', opt.task)
+  Dataset = get_dataset(opt.dataset[1], opt.task)
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)
 

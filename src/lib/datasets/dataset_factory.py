@@ -39,6 +39,7 @@ _sample_factory = {
 
 def get_dataset(dataset, task):
   class Dataset(dataset_factory[dataset], _sample_factory[task]):
+    print('################## Dataset about %s ##################' % dataset)
     pass
   return Dataset
   

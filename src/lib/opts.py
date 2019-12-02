@@ -40,7 +40,7 @@ class opts(object):
                                   'in the exp dir if load_model is empty.') 
 
     # system
-    self.parser.add_argument('--gpus', default='1',
+    self.parser.add_argument('--gpus', default='0',
                              help='-1 for CPU, use comma for multiple gpus')
     self.parser.add_argument('--num_workers', type=int, default=0,
                              help='dataloader threads. 0 for single-thread.')
@@ -231,9 +231,13 @@ class opts(object):
                              help='use ground truth depth.')
 
     # CenterNet-CentralNet-Add
-    self.parser.add_argument('--data_dir', default='F:/LWJ/Data/mulitspectral_data/4_merge',
+    # self.parser.add_argument('--data_dir', default='F:/LWJ/Data/mulitspectral_data/4_merge',
+    #                          help='path of data dir like: xxx/data')
+    # self.parser.add_argument('--exp_dir', default='F:\LWJ\Checkpoint\CenterNet-CentralNet',
+    #                          help='path to save exp data')
+    self.parser.add_argument('--data_dir', default='/home/vincent/Code/CenterNet-cuda10-multi-spectral/data',
                              help='path of data dir like: xxx/data')
-    self.parser.add_argument('--exp_dir', default='F:\LWJ\Checkpoint\CenterNet-CentralNet',
+    self.parser.add_argument('--exp_dir', default='/home/vincent/Checkpoint/CenterNet-CentralNet',
                              help='path to save exp data')
 
   def parse(self, args=''):

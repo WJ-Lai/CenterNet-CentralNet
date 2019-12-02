@@ -19,7 +19,7 @@ def main(opt):
 
   torch.manual_seed(opt.seed)
   torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
-  Dataset = get_dataset(opt.dataset, opt.task)
+  Dataset = get_dataset(opt.dataset[0], opt.task)
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)
 
