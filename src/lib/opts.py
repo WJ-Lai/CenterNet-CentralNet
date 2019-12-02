@@ -15,7 +15,7 @@ class opts(object):
     # basic experiment setting
     self.parser.add_argument('--task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet')
-    self.parser.add_argument('--dataset', default='rgb,fir',
+    self.parser.add_argument('--dataset', default='rgb,mir',
                              help='coco | kitti | coco_hp | pascal | voc | rgb | fir | mir | nir | fusion')
     self.parser.add_argument('--sensor1', default='rgb')
     self.parser.add_argument('--sensor2', default='rgb')
@@ -40,7 +40,7 @@ class opts(object):
                                   'in the exp dir if load_model is empty.') 
 
     # system
-    self.parser.add_argument('--gpus', default='0', 
+    self.parser.add_argument('--gpus', default='1',
                              help='-1 for CPU, use comma for multiple gpus')
     self.parser.add_argument('--num_workers', type=int, default=0,
                              help='dataloader threads. 0 for single-thread.')
@@ -86,11 +86,11 @@ class opts(object):
                              help='input width. -1 for default from dataset.')
     
     # train
-    self.parser.add_argument('--lr', type=float, default=1.25e-4, 
+    self.parser.add_argument('--lr', type=float, default=2.5e-4,
                              help='learning rate for batch size 12.')
-    self.parser.add_argument('--lr_step', type=str, default='90,120',
+    self.parser.add_argument('--lr_step', type=str, default='50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000',
                              help='drop learning rate by 10.')
-    self.parser.add_argument('--num_epochs', type=int, default=140,
+    self.parser.add_argument('--num_epochs', type=int, default=1000,
                              help='total training epochs.')
     self.parser.add_argument('--batch_size', type=int, default=4,
                              help='batch size')
@@ -98,7 +98,7 @@ class opts(object):
                              help='batch size on the master gpu.')
     self.parser.add_argument('--num_iters', type=int, default=-1,
                              help='default: #samples / batch_size.')
-    self.parser.add_argument('--val_intervals', type=int, default=1,
+    self.parser.add_argument('--val_intervals', type=int, default=5,
                              help='number of epochs to run validation.')
     self.parser.add_argument('--trainval', action='store_true',
                              help='include validation in training and '
@@ -231,9 +231,9 @@ class opts(object):
                              help='use ground truth depth.')
 
     # CenterNet-CentralNet-Add
-    self.parser.add_argument('--data_dir', default='/home/vincent/Code/CenterNet-cuda10-multi-spectral/data',
+    self.parser.add_argument('--data_dir', default='F:/LWJ/Data/mulitspectral_data/4_merge',
                              help='path of data dir like: xxx/data')
-    self.parser.add_argument('--exp_dir', default='/home/vincent/Checkpoint/CenterNet-CentralNet',
+    self.parser.add_argument('--exp_dir', default='F:\LWJ\Checkpoint\CenterNet-CentralNet',
                              help='path to save exp data')
 
   def parse(self, args=''):

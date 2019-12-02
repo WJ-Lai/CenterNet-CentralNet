@@ -1,29 +1,29 @@
 mergeuplayer
-tensor([1.], device='cuda:0')
-tensor([1.], device='cuda:0')
-tensor([1.], device='cuda:0')
+tensor([1.], device='cuda:1')
+tensor([1.], device='cuda:1')
+tensor([1.], device='cuda:1')
 
 mergeup_pre
-tensor([0.9990], device='cuda:0')
-tensor([1.0010], device='cuda:0')
-tensor([1.], device='cuda:0')
+tensor([1.0013], device='cuda:1')
+tensor([0.9987], device='cuda:1')
+tensor([1.], device='cuda:1')
 
 mergeup_kp_0
-tensor([0.9998], device='cuda:0')
-tensor([1.0001], device='cuda:0')
-tensor([1.0007], device='cuda:0')
+tensor([0.9989], device='cuda:1')
+tensor([1.0001], device='cuda:1')
+tensor([1.0007], device='cuda:1')
 
 mergeup_kp_1
-tensor([1.0004], device='cuda:0')
-tensor([0.9998], device='cuda:0')
-tensor([0.9988], device='cuda:0')
+tensor([1.0001], device='cuda:1')
+tensor([1.0005], device='cuda:1')
+tensor([0.9989], device='cuda:1')
 
 mergeup_head_0
-tensor([0.9974], device='cuda:0')
-tensor([0.9973], device='cuda:0')
-tensor([0.9973], device='cuda:0')
+tensor([0.9888], device='cuda:1')
+tensor([0.9886], device='cuda:1')
+tensor([0.9878], device='cuda:1')
 mergeup_head_1
-tensor([0.9975], device='cuda:0')
-tensor([0.9969], device='cuda:0')
-tensor([0.9967], device='cuda:0')
+tensor([0.9918], device='cuda:1')
+tensor([0.9919], device='cuda:1')
+tensor([0.9916], device='cuda:1')
 

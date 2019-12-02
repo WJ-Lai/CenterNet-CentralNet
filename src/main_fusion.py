@@ -76,7 +76,7 @@ def main(opt):
   logger = Logger(opt)
 
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
-  opt.device = torch.device('cuda' if opt.gpus[0] >= 0 else 'cpu')
+  opt.device = torch.device('cuda:'+opt.gpus_str if opt.gpus[0] >= 0 else 'cpu')
   os.environ['CUDA_VISIBLE_DEVICES'] = opt2.gpus_str
   opt2.device = opt.device
 
@@ -111,14 +111,14 @@ def main(opt):
       Dataset(opt, 'val'), 
       batch_size=1, 
       shuffle=False,
-      num_workers=1,
+      num_workers=opt.num_workers,
       pin_memory=True
   )
   val_loader2 = torch.utils.data.DataLoader(
       Dataset2(opt, 'val'),
       batch_size=1,
       shuffle=False,
-      num_workers=1,
+      num_workers=opt.num_workers,
       pin_memory=True
   )
 
@@ -150,7 +150,7 @@ def main(opt):
 
 
   for epoch in range(start_epoch + 1, opt.num_epochs + 1):
-    with open('weight.txt', 'w+') as doc:
+    with open(opt.save_dir+'\\'+opt.exp_id+'-weight.txt', 'w+') as doc:
         print_weight(model, doc)
     mark = epoch if opt.save_all else 'last'
     log_dict_train, _ = trainer.train_fusion(epoch, train_loader, train_loader2)
