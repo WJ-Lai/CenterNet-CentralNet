@@ -36,8 +36,11 @@ class Logger(object):
       opt_file.write('\n==> Opt:\n')
       for k, v in sorted(args.items()):
         opt_file.write('  %s: %s\n' % (str(k), str(v)))
-          
-    log_dir = opt.save_dir + '/logs_{}'.format(time_str)
+    if opt.resume:
+      assert opt.log_dir is not None, 'log dir cannot be None'
+      log_dir = opt.log_dir
+    else:
+      log_dir = opt.save_dir + '/logs_{}'.format(time_str)
     if USE_TENSORBOARD:
       self.writer = tensorboardX.SummaryWriter(log_dir=log_dir)
     else:

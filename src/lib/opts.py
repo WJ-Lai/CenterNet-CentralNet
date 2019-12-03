@@ -238,7 +238,9 @@ class opts(object):
     self.parser.add_argument('--data_dir', default='/home/vincent/Code/CenterNet-cuda10-multi-spectral/data',
                              help='path of data dir like: xxx/data')
     self.parser.add_argument('--exp_dir', default='/home/vincent/Checkpoint/CenterNet-CentralNet',
-                             help='path to save exp data')
+                             help='path of save exp data')
+    self.parser.add_argument('--log_dir', default=None,
+                             help='path of log data')
 
   def parse(self, args=''):
     if args == '':
