@@ -12,7 +12,6 @@ import time
 from progress.bar import Bar
 import torch
 
-from external.nms import soft_nms
 from opts import opts
 from logger import Logger
 from utils.utils import AverageMeter
@@ -82,8 +81,8 @@ def prefetch_test(opt):
 def test(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
 
-  Dataset = dataset_factory[opt.sensor1]
-  Dataset2 = dataset_factory[opt.sensor2]
+  Dataset = dataset_factory[opt.dataset[0]]
+  Dataset2 = dataset_factory[opt.dataset[1]]
 
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)
@@ -95,7 +94,6 @@ def test(opt):
 
   dataset2 = Dataset2(opt, split)
 
-  opt.arch='hourglassfusion'
   detector = Detector(opt)
 
   results = {}

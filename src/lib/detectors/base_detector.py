@@ -12,6 +12,8 @@ from models.model import create_model, load_model
 from utils.image import get_affine_transform
 from utils.debugger import Debugger
 
+import config as cf
+
 
 class BaseDetector(object):
   def __init__(self, opt):
@@ -89,7 +91,7 @@ class BaseDetector(object):
     load_time, pre_time, net_time, dec_time, post_time = 0, 0, 0, 0, 0
     merge_time, tot_time = 0, 0
     debugger = Debugger(dataset=self.opt.dataset, ipynb=(self.opt.debug==3),
-                        theme=self.opt.debugger_theme)
+                        theme=self.opt.debugger_theme, num_classes=len(cf.categories))
     start_time = time.time()
     pre_processed = False
     if isinstance(image_or_path_or_tensor, np.ndarray):

@@ -15,10 +15,8 @@ class opts(object):
     # basic experiment setting
     self.parser.add_argument('--task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet')
-    self.parser.add_argument('--dataset', default='rgb,mir',
+    self.parser.add_argument('--dataset', default='rgb,fir',
                              help='coco | kitti | coco_hp | pascal | voc | rgb | fir | mir | nir | fusion')
-    self.parser.add_argument('--sensor1', default='rgb')
-    self.parser.add_argument('--sensor2', default='rgb')
 
     self.parser.add_argument('--exp_id', default='default')
     self.parser.add_argument('--test', action='store_true')
@@ -31,7 +29,7 @@ class opts(object):
     self.parser.add_argument('--demo', default='', 
                              help='path to image/ image folders/ video. '
                                   'or "webcam"')
-    self.parser.add_argument('--load_model', default='',
+    self.parser.add_argument('--load_model', default='/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/rgbfir/model_400.pth',
                              help='path to pretrained model')
     self.parser.add_argument('--resume', action='store_true',
                              help='resume an experiment. '
@@ -64,10 +62,10 @@ class opts(object):
                              choices=['white', 'black'])
     
     # model
-    self.parser.add_argument('--arch', default='hourglass',
+    self.parser.add_argument('--arch', default='hourglassfusion',
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
-                                  'dlav0_34 | dla_34 | hourglass | hourglassfusion')
+                                  'dlav0_34 | dla_34 | hourglass | hourglassfusion | hourglasslater')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
@@ -249,6 +247,7 @@ class opts(object):
       opt = self.parser.parse_args(args)
 
     # fuse
+    assert opt.dataset is not None, 'You must set the dataset param by "--dataset"'
     opt.dataset = [str(sensor) for sensor in opt.dataset.split(',')]
 
 
@@ -265,10 +264,11 @@ class opts(object):
     opt.hm_hp = not opt.not_hm_hp
     opt.reg_hp_offset = (not opt.not_reg_hp_offset) and opt.hm_hp
 
+    assert opt.arch is not None, 'You must set the arch param by "--arch"'
     if opt.head_conv == -1: # init default head_conv
       opt.head_conv = 256 if 'dla' in opt.arch else 64
     opt.pad = 127 if 'hourglass' or 'hourglassfusion' in opt.arch else 31
-    opt.num_stacks = 2 if opt.arch == 'hourglass' or opt.arch == 'hourglassfusion' else 1
+    opt.num_stacks = 2 if opt.arch == 'hourglass' or opt.arch == 'hourglassfusion' or opt.arch == 'hourglasslater'else 1
 
     if opt.trainval:
       opt.val_intervals = 100000000
