@@ -37,7 +37,7 @@ class FIR(data.Dataset):
       if split == 'test':
         self.annot_path = os.path.join(
           self.data_dir, 'annotations',
-          'test.json')
+          opt.test_dataset+'.json')
       else:
         self.annot_path = os.path.join(
           self.data_dir, 'annotations', 
