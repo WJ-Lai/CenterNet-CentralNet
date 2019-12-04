@@ -239,7 +239,7 @@ class opts(object):
                              help='path of save exp data')
     self.parser.add_argument('--log_dir', default=None,
                              help='path of log data')
-    self.parser.add_argument('--test_dataset', default='train',
+    self.parser.add_argument('--test_dataset', default='test',
                              help='type of test dataset')
 
   def parse(self, args=''):
