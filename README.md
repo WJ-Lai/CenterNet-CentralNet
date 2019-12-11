@@ -6,3 +6,5 @@
 4. 可以在tensorboardX中记录权重变化
 5. src/test_code中为自己验证代码功能的测试代码
 6. 如果想要draw的话，需要在basr_trainer.py的ModleWithLoss_fusion或ModleWithLoss中取消注释，同时model.py中改为model_factory['hourglassdrawing']
+
+test的时候要注意input size

@@ -129,6 +129,7 @@ def test(opt):
 
 if __name__ == '__main__':
   opt = opts().parse()
+  opt.arch='hourglassfusion'
   test(opt)
   # if opt.not_prefetch_test:
   #   test(opt)

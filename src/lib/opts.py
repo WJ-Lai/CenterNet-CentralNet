@@ -62,7 +62,7 @@ class opts(object):
                              choices=['white', 'black'])
     
     # model
-    self.parser.add_argument('--arch', default='hourglassfusion',
+    self.parser.add_argument('--arch', default='hourglass',
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
                                   'dlav0_34 | dla_34 | hourglass | hourglassfusion | hourglasslater')
@@ -107,7 +107,7 @@ class opts(object):
                              help='flip data augmentation.')
     self.parser.add_argument('--test_scales', type=str, default='1',
                              help='multi scale test augmentation.')
-    self.parser.add_argument('--nms', action='store_true',
+    self.parser.add_argument('--nms',  action='store_true',
                              help='run nms in testing.')
     self.parser.add_argument('--K', type=int, default=100,
                              help='max number of output objects.') 
