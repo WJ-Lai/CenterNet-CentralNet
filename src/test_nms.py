@@ -19,7 +19,7 @@ from utils.utils import AverageMeter
 from datasets.dataset_factory import dataset_factory
 from detectors.detector_factory import detector_factory
 from external.nms import soft_nms
-
+from itertools import combinations
 import copy
 
 class PrefetchDataset(torch.utils.data.Dataset):
@@ -138,6 +138,19 @@ def nms(*args):
   print('Bounding Box change: %s' % bbox_change)
   return results[0]
 
+def nms_multi(results):
+  bbox_change = 0
+  for img_id in results[0].keys():
+    for categories_id in range(1, 5):
+      res_stack = [results[i][img_id][categories_id] for i in range(len(results))]
+      results[0][img_id][categories_id] = np.vstack(res_stack)
+      bbox_num_before = cal_bbox(results[0])
+      soft_nms(results[0][img_id][categories_id], Nt=0.5, method=2)
+      bbox_num_after = cal_bbox(results[0])
+      bbox_change += bbox_num_before-bbox_num_after
+  print('Bounding Box change: %s' % bbox_change)
+  return results[0]
+
 def cal_mAP(results, dataset):
   dataset.run_eval(results, opt.save_dir)
 
@@ -184,6 +197,18 @@ def output_sing_mAP():
   cal_mAP(results_mir, dataset)
   cal_mAP(results_nir, dataset)
 
+def get_all_sensor_combinations():
+  sensor = ['rgb', 'fir', 'mir', 'nir']
+  tmp_list, sensor_combinations = [], []
+  for i in range(2, len(sensor)+1):
+      iter1 = combinations(sensor, i)
+      tmp_list.append(iter1)
+
+  for i in tmp_list:
+      for j in i:
+          sensor_combinations.append(list(j))
+  return sensor_combinations
+
 if __name__ == '__main__':
   opt = opts().parse()
   # results_rgb, dataset = output_result(opt, 'rgb')
@@ -196,10 +221,21 @@ if __name__ == '__main__':
   # output_fusion_mAP()
   # output_fusion_mAP_rgb_after()
 
-  results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
-  results = nms(results_rgb, results_fir, results_mir, results_nir)
-  cal_mAP(results, dataset)
+  # results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  # results = nms(results_rgb, results_fir, results_mir, results_nir)
+  # cal_mAP(results, dataset)
+  #
+  # results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  # results = nms(results_nir, results_mir, results_fir)
+  # cal_mAP(results, dataset)
 
+  sensor_combinations = get_all_sensor_combinations()
   results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
-  results = nms(results_nir, results_mir, results_fir)
-  cal_mAP(results, dataset)
+  results_dict = {'rgb': results_rgb, 'fir': results_fir, 'mir': results_mir, 'nir': results_nir}
+  for sensor_list in sensor_combinations:
+    results = []
+    for sensor in sensor_list:
+      results.append(copy.deepcopy(results_dict[sensor]))
+    results = nms_multi(results)
+    print(sensor_list)
+    cal_mAP(results, dataset)
