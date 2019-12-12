@@ -9,7 +9,7 @@ categories = ['bike', 'car', 'color_cone', 'person']
 main_path = '/home/vincent/Code/CenterNet-cuda10-multi-spectral'
 # images_save_path = os.path.join(main_path, 'exp/output_images/', sensor)
 images_save_path = os.path.join('/home/vincent/20191117')
-train_size = 512
+train_size = 128
 
 # rgb
 rgb_mean = [0.083381, 0.083511, 0.090018]

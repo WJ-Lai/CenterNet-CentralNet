@@ -19,35 +19,18 @@ from trains.train_factory import train_factory
 
 
 def print_weight(model, doc):
-    print('mergeuplayer', file=doc)
-    print(model._modules['mergeuplayer'].alpha1.data, file=doc)
-    print(model._modules['mergeuplayer'].alpha2.data, file=doc)
-    print(model._modules['mergeuplayer'].alpha3.data, file=doc)
-    print('', file=doc)
-    print('mergeup_pre', file=doc)
-    print(model._modules['mergeup_pre'].alpha1.data, file=doc)
-    print(model._modules['mergeup_pre'].alpha2.data, file=doc)
-    print(model._modules['mergeup_pre'].alpha3.data, file=doc)
-    print('', file=doc)
-    print('mergeup_kp_0', file=doc)
-    print(model._modules['mergeup_kp']._modules['0'].alpha1.data, file=doc)
-    print(model._modules['mergeup_kp']._modules['0'].alpha2.data, file=doc)
-    print(model._modules['mergeup_kp']._modules['0'].alpha3.data, file=doc)
-    print('', file=doc)
-    print('mergeup_kp_1', file=doc)
-    print(model._modules['mergeup_kp']._modules['1'].alpha1.data, file=doc)
-    print(model._modules['mergeup_kp']._modules['1'].alpha2.data, file=doc)
-    print(model._modules['mergeup_kp']._modules['1'].alpha3.data, file=doc)
-    print('', file=doc)
-    print('mergeup_head_0', file=doc)
-    print(model._modules['mergeup_head']._modules['0'].alpha1.data, file=doc)
-    print(model._modules['mergeup_head']._modules['0'].alpha2.data, file=doc)
-    print(model._modules['mergeup_head']._modules['0'].alpha3.data, file=doc)
-    print('mergeup_head_1', file=doc)
-    print(model._modules['mergeup_head']._modules['1'].alpha1.data, file=doc)
-    print(model._modules['mergeup_head']._modules['1'].alpha2.data, file=doc)
-    print(model._modules['mergeup_head']._modules['1'].alpha3.data, file=doc)
-    print('', file=doc)
+    layer_name_list = ['mergeup_pre', 'mergeup_kp', 'mergeup_head']
+    for layer_name in layer_name_list:
+        print(layer_name, file=doc)
+        if layer_name in ['mergeup_kp', 'mergeup_head']:
+            for i in range(len(model._modules[layer_name]._modules)):
+                print(layer_name+str(i), file=doc)
+                for j in range(len(model._modules[layer_name]._modules[str(i)].alpha)):
+                    print(model._modules[layer_name]._modules[str(i)].alpha[j].data, file=doc)
+        else:
+            for i in range(len(model._modules[layer_name].alpha)):
+                print(model._modules[layer_name].alpha[i].data, file=doc)
+        print('', file=doc)
 
 class ConcatDataset(torch.utils.data.Dataset):
     def __init__(self, *datasets):

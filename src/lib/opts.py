@@ -29,7 +29,7 @@ class opts(object):
     self.parser.add_argument('--demo', default='', 
                              help='path to image/ image folders/ video. '
                                   'or "webcam"')
-    self.parser.add_argument('--load_model', default='/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/rgbfir/model_400.pth',
+    self.parser.add_argument('--load_model', default='',
                              help='path to pretrained model')
     self.parser.add_argument('--resume', action='store_true',
                              help='resume an experiment. '
@@ -353,7 +353,6 @@ class opts(object):
         opt.heads.update({'hp_offset': 2})
     else:
       assert 0, 'task not defined!'
-    print('heads', opt.heads)
     return opt
 
   def init(self, args=''):
