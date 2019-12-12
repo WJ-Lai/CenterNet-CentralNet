@@ -7,4 +7,6 @@
 5. src/test_code中为自己验证代码功能的测试代码
 6. 如果想要draw的话，需要在basr_trainer.py的ModleWithLoss_fusion或ModleWithLoss中取消注释，同时model.py中改为model_factory['hourglassdrawing']
 7. test_nms中可查看单传感器与nms后融合结果
+8. main_fusion_test_loader.py中为统一场景输入的融合loader的代码，但是没有结局的mead和std的问题(在opt)中，debug函数、detector类会用到
+
 test的时候要注意input size
