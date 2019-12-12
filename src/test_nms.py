@@ -122,17 +122,21 @@ def cal_bbox(results):
       bbox_sum += bbox_num
   return bbox_sum
 
-def nms(results1, results2):
+def nms(*args):
+  results = []
+  for sensor in args:
+    results.append(sensor)
   bbox_change = 0
-  for img_id in results1.keys():
+  for img_id in results[0].keys():
     for categories_id in range(1, 5):
-      results1[img_id][categories_id] = np.vstack((results1[img_id][categories_id],results2[img_id][categories_id]))
-      bbox_num_before = cal_bbox(results1)
-      soft_nms(results1[img_id][categories_id], Nt=0.5, method=2)
-      bbox_num_after = cal_bbox(results1)
+      res_stack = [results[i][img_id][categories_id] for i in range(len(results))]
+      results[0][img_id][categories_id] = np.vstack(res_stack)
+      bbox_num_before = cal_bbox(results[0])
+      soft_nms(results[0][img_id][categories_id], Nt=0.5, method=2)
+      bbox_num_after = cal_bbox(results[0])
       bbox_change += bbox_num_before-bbox_num_after
   print('Bounding Box change: %s' % bbox_change)
-  return results1
+  return results[0]
 
 def cal_mAP(results, dataset):
   dataset.run_eval(results, opt.save_dir)
@@ -189,5 +193,13 @@ if __name__ == '__main__':
   # save_result(results_rgb, results_fir, results_mir, results_nir)
 
   # output_sing_mAP()
-  output_fusion_mAP()
+  # output_fusion_mAP()
   # output_fusion_mAP_rgb_after()
+
+  results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  results = nms(results_rgb, results_fir, results_mir, results_nir)
+  cal_mAP(results, dataset)
+
+  results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  results = nms(results_nir, results_mir, results_fir)
+  cal_mAP(results, dataset)
