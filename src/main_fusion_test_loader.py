@@ -47,11 +47,7 @@ def main(opt):
   torch.manual_seed(opt.seed)
   torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
 
-  # for fusion-----create new train loader
-  Dataset2 = get_dataset(opt.dataset[1], opt.task)
-  opt2 = opts().update_dataset_info_and_set_heads(opt, Dataset2)
-
-  Dataset = get_dataset(opt.dataset[0], opt.task)
+  Dataset = get_dataset('fusion', 'ctdet_fusion')
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)
 
@@ -59,8 +55,6 @@ def main(opt):
 
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.device = torch.device('cuda:'+opt.gpus_str if opt.gpus[0] >= 0 else 'cpu')
-  os.environ['CUDA_VISIBLE_DEVICES'] = opt2.gpus_str
-  opt2.device = opt.device
 
   print('Creating model...')
   model = create_model('hourglassfusion', opt.heads, opt.head_conv)
@@ -97,13 +91,6 @@ def main(opt):
       num_workers=opt.num_workers,
       pin_memory=True
   )
-  val_loader2 = torch.utils.data.DataLoader(
-      Dataset2(opt, 'val'),
-      batch_size=1,
-      shuffle=False,
-      num_workers=opt.num_workers,
-      pin_memory=True
-  )
 
   if opt.test:
     _, preds = trainer.val(0, val_loader)
@@ -113,16 +100,7 @@ def main(opt):
   train_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'train'),
       batch_size=opt.batch_size,
-      shuffle=False,
-      num_workers=opt.num_workers,
-      pin_memory=True,
-      drop_last=True
-  )
-
-  train_loader2 = torch.utils.data.DataLoader(
-      Dataset2(opt2, 'train'),
-      batch_size=opt.batch_size,
-      shuffle=False,
+      shuffle=True,
       num_workers=opt.num_workers,
       pin_memory=True,
       drop_last=True
@@ -136,7 +114,7 @@ def main(opt):
     with open(opt.save_dir+'\\'+opt.exp_id+'-weight.txt', 'w+') as doc:
         print_weight(model, doc)
     mark = epoch if opt.save_all else 'last'
-    log_dict_train, _ = trainer.train_fusion(epoch, train_loader, train_loader2)
+    log_dict_train, _ = trainer.train_fusion_loader(epoch, train_loader)
     logger.write('epoch: {} |'.format(epoch))
     for k, v in log_dict_train.items():
       logger.scalar_summary('train_{}'.format(k), v, epoch)
@@ -145,7 +123,7 @@ def main(opt):
       save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)), 
                  epoch, model, optimizer)
       with torch.no_grad():
-        log_dict_val, preds = trainer.val(epoch, val_loader, val_loader2)
+        log_dict_val, preds = trainer.val_fusion_loader(epoch, val_loader)
       for k, v in log_dict_val.items():
         logger.scalar_summary('val_{}'.format(k), v, epoch)
         logger.write('{} {:8f} | '.format(k, v))

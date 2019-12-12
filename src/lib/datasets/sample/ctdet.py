@@ -30,6 +30,7 @@ class CTDetDataset(data.Dataset):
     img_id = self.images[index]
     file_name = self.coco.loadImgs(ids=[img_id])[0]['file_name']
     img_path = os.path.join(self.img_dir, file_name)
+    print(img_path)
     ann_ids = self.coco.getAnnIds(imgIds=[img_id])
     anns = self.coco.loadAnns(ids=ann_ids)
     num_objs = min(len(anns), self.max_objs)

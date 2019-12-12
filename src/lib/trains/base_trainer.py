@@ -152,6 +152,7 @@ class BaseTrainer(object):
     bar = Bar('{}/{}'.format(opt.task, opt.exp_id), max=num_iters)
     end = time.time()
     iter_id = 0
+
     for batch1, batch2 in zip(data_loader1, data_loader2):
       if iter_id >= num_iters:
         break
@@ -200,6 +201,75 @@ class BaseTrainer(object):
     ret['time'] = bar.elapsed_td.total_seconds() / 60.
     return ret, results
 
+
+  def run_epoch_fusion_loader(self, phase, epoch, data_loader):
+    model_with_loss = self.model_with_loss
+    if phase == 'train':
+      model_with_loss.train()
+    else:
+      if len(self.opt.gpus) > 1:
+        model_with_loss = self.model_with_loss.module
+      model_with_loss.eval()
+      torch.cuda.empty_cache()
+
+    opt = self.opt
+    results = {}
+    data_time, batch_time = AverageMeter(), AverageMeter()
+    avg_loss_stats = {l: AverageMeter() for l in self.loss_stats}
+    num_iters = len(data_loader) if opt.num_iters < 0 else opt.num_iters
+    bar = Bar('{}/{}'.format(opt.task, opt.exp_id), max=num_iters)
+    end = time.time()
+    iter_id = 0
+
+    for batch1, batch2 in data_loader:
+      if iter_id >= num_iters:
+        break
+      data_time.update(time.time() - end)
+
+      for k in batch1:
+        if k != 'meta':
+          batch1[k] = batch1[k].to(device=opt.device, non_blocking=True)
+          batch2[k] = batch2[k].to(device=opt.device, non_blocking=True)
+      output, loss, loss_stats = model_with_loss(batch1, batch2)
+      loss = loss.mean()
+      if phase == 'train':
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+      batch_time.update(time.time() - end)
+      end = time.time()
+
+      Bar.suffix = '{phase}: [{0}][{1}/{2}]|Tot: {total:} |ETA: {eta:} '.format(
+        epoch, iter_id, num_iters, phase=phase,
+        total=bar.elapsed_td, eta=bar.eta_td)
+      for l in avg_loss_stats:
+        avg_loss_stats[l].update(
+          loss_stats[l].mean().item(), batch1['input'].size(0))
+        Bar.suffix = Bar.suffix + '|{} {:.4f} '.format(l, avg_loss_stats[l].avg)
+      if not opt.hide_data_time:
+        Bar.suffix = Bar.suffix + '|Data {dt.val:.3f}s({dt.avg:.3f}s) ' \
+                                  '|Net {bt.avg:.3f}s'.format(dt=data_time, bt=batch_time)
+      if opt.print_iter > 0:
+        if iter_id % opt.print_iter == 0:
+          print('{}/{}| {}'.format(opt.task, opt.exp_id, Bar.suffix))
+      else:
+        bar.next()
+
+      if opt.debug > 0:
+        self.debug(batch1, output, iter_id)
+
+      if opt.test:
+        self.save_result(output, batch1, results)
+      del output, loss, loss_stats
+
+      iter_id += 1
+
+    bar.finish()
+    ret = {k: v.avg for k, v in avg_loss_stats.items()}
+    ret['time'] = bar.elapsed_td.total_seconds() / 60.
+    return ret, results
+
+
   def debug(self, batch, output, iter_id):
     raise NotImplementedError
 
@@ -209,11 +279,20 @@ class BaseTrainer(object):
   def _get_losses(self, opt):
     raise NotImplementedError
   
-  def val(self, epoch, data_loader, data_loader2):
-    return self.run_epoch_fusion('val', epoch, data_loader, data_loader2)
+  def val(self, epoch, data_loader):
+    return self.run_epoch_fusion('val', epoch, data_loader)
 
   def train(self, epoch, data_loader):
     return self.run_epoch('train', epoch, data_loader)
 
   def train_fusion(self, epoch, data_loader1, data_loader2):
     return self.run_epoch_fusion('train', epoch, data_loader1, data_loader2)
+
+  def train_fusion_loader(self, epoch, data_loader):
+    return self.run_epoch_fusion_loader('train', epoch, data_loader)
+
+  def val_fusion(self, epoch, data_loader, data_loader2):
+    return self.run_epoch_fusion('val', epoch, data_loader, data_loader2)
+
+  def val_fusion_loader(self, epoch, data_loader):
+    return self.run_epoch_fusion_loader('val', epoch, data_loader)

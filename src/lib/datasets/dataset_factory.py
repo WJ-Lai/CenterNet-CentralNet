@@ -6,6 +6,7 @@ from .sample.ddd import DddDataset
 from .sample.exdet import EXDetDataset
 from .sample.ctdet import CTDetDataset
 from .sample.multi_pose import MultiPoseDataset
+from .sample.ctdet_fusion import CTDetDataset_fusion
 
 from .dataset.coco import COCO
 from .dataset.pascal import PascalVOC
@@ -16,6 +17,8 @@ from .dataset.rgb import RGB
 from .dataset.fir import FIR
 from .dataset.mir import MIR
 from .dataset.nir import NIR
+from .dataset.camera import CAMERA
+
 
 dataset_factory = {
   'coco': COCO,
@@ -26,14 +29,16 @@ dataset_factory = {
   'rgb': RGB,
   'fir': FIR,
   'mir': MIR,
-  'nir': NIR
+  'nir': NIR,
+  'fusion':CAMERA
 }
 
 _sample_factory = {
   'exdet': EXDetDataset,
   'ctdet': CTDetDataset,
   'ddd': DddDataset,
-  'multi_pose': MultiPoseDataset
+  'multi_pose': MultiPoseDataset,
+  'ctdet_fusion': CTDetDataset_fusion
 }
 
 

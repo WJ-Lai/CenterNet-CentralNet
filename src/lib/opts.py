@@ -98,7 +98,7 @@ class opts(object):
                              help='default: #samples / batch_size.')
     self.parser.add_argument('--val_intervals', type=int, default=5,
                              help='number of epochs to run validation.')
-    self.parser.add_argument('--trainval', default=True,#action='store_true',
+    self.parser.add_argument('--trainval', action='store_true',
                              help='include validation in training and '
                                   'test on test set')
 
