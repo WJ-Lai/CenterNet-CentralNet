@@ -20,6 +20,8 @@ from datasets.dataset_factory import dataset_factory
 from detectors.detector_factory import detector_factory
 from external.nms import soft_nms
 
+import copy
+
 class PrefetchDataset(torch.utils.data.Dataset):
   def __init__(self, opt, dataset, pre_process_func):
     self.images = dataset.images
@@ -112,33 +114,80 @@ def test(opt):
 
   return results, dataset
 
+def cal_bbox(results):
+  bbox_sum = 0
+  for _, img in results.items():
+    for _, categories_id in img.items():
+      bbox_num,_ = np.shape(categories_id)
+      bbox_sum += bbox_num
+  return bbox_sum
+
 def nms(results1, results2):
+  bbox_change = 0
   for img_id in results1.keys():
     for categories_id in range(1, 5):
       results1[img_id][categories_id] = np.vstack((results1[img_id][categories_id],results2[img_id][categories_id]))
+      bbox_num_before = cal_bbox(results1)
       soft_nms(results1[img_id][categories_id], Nt=0.5, method=2)
-
-  for img_id in results1.keys():
-    for categories_id in range(1, 5):
-      results1[img_id][categories_id] = results1[img_id][categories_id][20:25,:]
+      bbox_num_after = cal_bbox(results1)
+      bbox_change += bbox_num_before-bbox_num_after
+  print('Bounding Box change: %s' % bbox_change)
   return results1
 
 def cal_mAP(results, dataset):
   dataset.run_eval(results, opt.save_dir)
 
+def save_result(results_rgb, results_fir, results_mir, results_nir):
+  np.save('results_rgb.npy', results_rgb)
+  np.save('results_fir.npy', results_fir)
+  np.save('results_mir.npy', results_mir)
+  np.save('results_nir.npy', results_nir)
+
+def load_result():
+  results_rgb = np.load('results_rgb.npy').item()
+  results_fir = np.load('results_fir.npy').item()
+  results_mir = np.load('results_mir.npy').item()
+  results_nir = np.load('results_nir.npy').item()
+  Dataset = dataset_factory['rgb']
+  dataset = Dataset(opt, 'test')
+  return results_rgb, results_fir, results_mir, results_nir, dataset
+
+def output_result(opt, dataset):
+  opt.dataset = dataset
+  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_last.pth'
+  results, dataset = test(opt)
+  return results, dataset
+
+def output_fusion_mAP():
+  # results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  results_sensor = load_result()
+  for i in range(1,4):
+    results_rgb = copy.deepcopy(results_sensor[0])
+    results = nms(results_rgb, results_sensor[i])
+    cal_mAP(results, results_sensor[4])
+
+def output_fusion_mAP_rgb_after():
+  # results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  results_sensor = load_result()
+  for i in range(1, 4):
+    results = nms(results_sensor[i], results_sensor[0])
+    cal_mAP(results, results_sensor[4])
+
+def output_sing_mAP():
+  results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
+  cal_mAP(results_rgb, dataset)
+  cal_mAP(results_fir, dataset)
+  cal_mAP(results_mir, dataset)
+  cal_mAP(results_nir, dataset)
+
 if __name__ == '__main__':
   opt = opts().parse()
-  opt.dataset = 'rgb'
-  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+opt.dataset+'/model_last.pth'
-  results1, dataset = test(opt)
-  # cal_mAP(results1, dataset)
+  # results_rgb, dataset = output_result(opt, 'rgb')
+  # results_fir, dataset = output_result(opt, 'fir')
+  # results_mir, dataset = output_result(opt, 'mir')
+  # results_nir, dataset = output_result(opt, 'nir')
+  # save_result(results_rgb, results_fir, results_mir, results_nir)
 
-  opt.dataset = 'mir'
-  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+opt.dataset+'/model_last.pth'
-  results2, dataset = test(opt)
-  # cal_mAP(results2, dataset)
-
-  results = nms(results1, results2)
-
-  cal_mAP(results, dataset)
-
+  # output_sing_mAP()
+  output_fusion_mAP()
+  # output_fusion_mAP_rgb_after()
