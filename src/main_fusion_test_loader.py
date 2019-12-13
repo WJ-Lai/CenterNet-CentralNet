@@ -57,7 +57,7 @@ def main(opt):
   opt.device = torch.device('cuda:'+opt.gpus_str if opt.gpus[0] >= 0 else 'cpu')
 
   print('Creating model...')
-  model = create_model('hourglassfusionnms', opt.heads, opt.head_conv)
+  model = create_model(opt.arch, opt.heads, opt.head_conv)
   # print(model)
 
   print(model._name)
