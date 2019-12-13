@@ -14,6 +14,9 @@ from .networks.resnet_dcn import get_pose_net as get_pose_net_dcn
 from .networks.large_hourglass import get_large_hourglass_net
 from .networks.large_hourglass_fusion import get_large_hourglass_fusion_net
 from .networks.large_hourglass_drawing import get_large_hourglass_drawing_net
+from .networks.large_hourglass_fusion_nms import get_large_hourglass_fusion_nms
+
+import config as cf
 
 _model_factory = {
   'res': get_pose_net, # default Resnet with deconv
@@ -23,6 +26,7 @@ _model_factory = {
   'hourglass': get_large_hourglass_net,
   'hourglassfusion': get_large_hourglass_fusion_net,
   'hourglassdrawing': get_large_hourglass_drawing_net,
+  'hourglassfusionnms': get_large_hourglass_fusion_nms,
 }
 
 def create_model(arch, heads, head_conv):
@@ -30,7 +34,10 @@ def create_model(arch, heads, head_conv):
   arch = arch[:arch.find('_')] if '_' in arch else arch
   get_model = _model_factory[arch]
   # get_model = _model_factory['hourglassdrawing']
-  model = get_model(num_layers=num_layers, heads=heads, head_conv=head_conv)
+  if arch == 'hourglassfusionnms':
+    model = get_model(num_layers=num_layers, heads=heads, head_conv=head_conv, sensor_num=len(cf.sensor))
+  else:
+    model = get_model(num_layers=num_layers, heads=heads, head_conv=head_conv)
   return model
 
 def load_model(model, model_path, optimizer=None, resume=False, 

@@ -57,7 +57,7 @@ def main(opt):
   opt.device = torch.device('cuda:'+opt.gpus_str if opt.gpus[0] >= 0 else 'cpu')
 
   print('Creating model...')
-  model = create_model('hourglassfusion', opt.heads, opt.head_conv)
+  model = create_model('hourglassfusionnms', opt.heads, opt.head_conv)
   # print(model)
 
   print(model._name)
@@ -111,8 +111,8 @@ def main(opt):
 
 
   for epoch in range(start_epoch + 1, opt.num_epochs + 1):
-    with open(opt.save_dir+'\\'+opt.exp_id+'-weight.txt', 'w+') as doc:
-        print_weight(model, doc)
+    # with open(opt.save_dir+'\\'+opt.exp_id+'-weight.txt', 'w+') as doc:
+    #     print_weight(model, doc)
     mark = epoch if opt.save_all else 'last'
     log_dict_train, _ = trainer.train_fusion_loader(epoch, train_loader)
     logger.write('epoch: {} |'.format(epoch))

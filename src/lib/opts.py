@@ -15,7 +15,7 @@ class opts(object):
     # basic experiment setting
     self.parser.add_argument('--task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet')
-    self.parser.add_argument('--dataset', default='rgb,fir',
+    self.parser.add_argument('--dataset', default='rgb,fir,mir',
                              help='coco | kitti | coco_hp | pascal | voc | rgb | fir | mir | nir | fusion')
 
     self.parser.add_argument('--exp_id', default='default')

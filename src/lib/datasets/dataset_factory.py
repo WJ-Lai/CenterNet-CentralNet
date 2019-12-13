@@ -30,7 +30,7 @@ dataset_factory = {
   'fir': FIR,
   'mir': MIR,
   'nir': NIR,
-  'fusion':CAMERA
+  'fusion':CAMERA,
 }
 
 _sample_factory = {

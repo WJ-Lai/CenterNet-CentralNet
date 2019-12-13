@@ -8,6 +8,7 @@ from progress.bar import Bar
 from models.data_parallel import DataParallel
 from utils.utils import AverageMeter
 # from torchviz import make_dot
+import torch.nn as nn
 
 from tensorboardX import SummaryWriter
 
@@ -33,17 +34,16 @@ class ModleWithLoss_fusion(torch.nn.Module):
     self.model = model
     self.loss = loss
 
-  def forward(self, batch1, batch2):
+  def forward(self, batches):
     # with SummaryWriter('./hourglass') as w:
     #   w.add_graph(self.model, batch1['input'])
     # ff
-    batch1_input = batch1['input']
-    batch2_input = batch2['input']
-    outputs = self.model(batch1_input, batch2_input)
+    batch_input = [batch['input'] for batch in batches]
+    outputs = self.model(batch_input)
     # g = make_dot(outputs[0]['hm'])
     # g.render('houglass_fusion_model_diff', view=False)
 
-    loss, loss_stats = self.loss(outputs, batch1)
+    loss, loss_stats = self.loss(outputs, batches[0])
     return outputs[-1], loss, loss_stats
 
 class BaseTrainer(object):
@@ -221,16 +221,16 @@ class BaseTrainer(object):
     end = time.time()
     iter_id = 0
 
-    for batch1, batch2 in data_loader:
+    for batches in data_loader:
       if iter_id >= num_iters:
         break
       data_time.update(time.time() - end)
 
-      for k in batch1:
-        if k != 'meta':
-          batch1[k] = batch1[k].to(device=opt.device, non_blocking=True)
-          batch2[k] = batch2[k].to(device=opt.device, non_blocking=True)
-      output, loss, loss_stats = model_with_loss(batch1, batch2)
+      for batch in batches:
+        for k in batch:
+          if k != 'meta':
+            batch[k] = batch[k].to(device=opt.device, non_blocking=True)
+      output, loss, loss_stats = model_with_loss(batches)
       loss = loss.mean()
       if phase == 'train':
         self.optimizer.zero_grad()
@@ -244,7 +244,7 @@ class BaseTrainer(object):
         total=bar.elapsed_td, eta=bar.eta_td)
       for l in avg_loss_stats:
         avg_loss_stats[l].update(
-          loss_stats[l].mean().item(), batch1['input'].size(0))
+          loss_stats[l].mean().item(), batches[0]['input'].size(0))
         Bar.suffix = Bar.suffix + '|{} {:.4f} '.format(l, avg_loss_stats[l].avg)
       if not opt.hide_data_time:
         Bar.suffix = Bar.suffix + '|Data {dt.val:.3f}s({dt.avg:.3f}s) ' \
@@ -256,10 +256,10 @@ class BaseTrainer(object):
         bar.next()
 
       if opt.debug > 0:
-        self.debug(batch1, output, iter_id)
+        self.debug(batches[0], output, iter_id)
 
       if opt.test:
-        self.save_result(output, batch1, results)
+        self.save_result(output, batches[0], results)
       del output, loss, loss_stats
 
       iter_id += 1
