@@ -22,72 +22,11 @@ from external.nms import soft_nms
 from itertools import combinations
 import copy
 
-class PrefetchDataset(torch.utils.data.Dataset):
-  def __init__(self, opt, dataset, pre_process_func):
-    self.images = dataset.images
-    self.load_image_func = dataset.coco.loadImgs
-    self.img_dir = dataset.img_dir
-    self.pre_process_func = pre_process_func
-    self.opt = opt
-  
-  def __getitem__(self, index):
-    img_id = self.images[index]
-    img_info = self.load_image_func(ids=[img_id])[0]
-    img_path = os.path.join(self.img_dir, img_info['file_name'])
-    image = cv2.imread(img_path)
-    images, meta = {}, {}
-    for scale in opt.test_scales:
-      if opt.task == 'ddd':
-        images[scale], meta[scale] = self.pre_process_func(
-          image, scale, img_info['calib'])
-      else:
-        images[scale], meta[scale] = self.pre_process_func(image, scale)
-    return img_id, {'images': images, 'image': image, 'meta': meta}
-
-  def __len__(self):
-    return len(self.images)
-
-def prefetch_test(opt):
-  os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
-
-  Dataset = dataset_factory[opt.dataset]
-  opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
-  print(opt)
-  Logger(opt)
-  Detector = detector_factory[opt.task]
-  
-  split = 'val' if not opt.trainval else 'test'
-  dataset = Dataset(opt, split)
-  detector = Detector(opt)
-  
-  data_loader = torch.utils.data.DataLoader(
-    PrefetchDataset(opt, dataset, detector.pre_process), 
-    batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-
-  results = {}
-  num_iters = len(dataset)
-  bar = Bar('{}'.format(opt.exp_id), max=num_iters)
-  time_stats = ['tot', 'load', 'pre', 'net', 'dec', 'post', 'merge']
-  avg_time_stats = {t: AverageMeter() for t in time_stats}
-  for ind, (img_id, pre_processed_images) in enumerate(data_loader):
-    ret = detector.run(pre_processed_images)
-    results[img_id.numpy().astype(np.int32)[0]] = ret['results']
-    Bar.suffix = '[{0}/{1}]|Tot: {total:} |ETA: {eta:} '.format(
-                   ind, num_iters, total=bar.elapsed_td, eta=bar.eta_td)
-    for t in avg_time_stats:
-      avg_time_stats[t].update(ret[t])
-      Bar.suffix = Bar.suffix + '|{} {tm.val:.3f}s ({tm.avg:.3f}s) '.format(
-        t, tm = avg_time_stats[t])
-    bar.next()
-  bar.finish()
-  dataset.run_eval(results, opt.save_dir)
-
 def test(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
 
   Dataset = dataset_factory[opt.dataset]
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
-  print(opt)
   Logger(opt)
   Detector = detector_factory[opt.task]
   
@@ -171,7 +110,7 @@ def load_result():
 
 def output_result(opt, dataset):
   opt.dataset = dataset
-  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_last.pth'
+  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_best.pth'
   results, dataset = test(opt)
   return results, dataset
 
@@ -200,7 +139,7 @@ def output_sing_mAP():
 def get_all_sensor_combinations():
   sensor = ['rgb', 'fir', 'mir', 'nir']
   tmp_list, sensor_combinations = [], []
-  for i in range(2, len(sensor)+1):
+  for i in range(1, len(sensor)+1):
       iter1 = combinations(sensor, i)
       tmp_list.append(iter1)
 
@@ -211,23 +150,15 @@ def get_all_sensor_combinations():
 
 if __name__ == '__main__':
   opt = opts().parse()
-  # results_rgb, dataset = output_result(opt, 'rgb')
-  # results_fir, dataset = output_result(opt, 'fir')
-  # results_mir, dataset = output_result(opt, 'mir')
-  # results_nir, dataset = output_result(opt, 'nir')
-  # save_result(results_rgb, results_fir, results_mir, results_nir)
+  results_rgb, dataset = output_result(opt, 'rgb')
+  results_fir, dataset = output_result(opt, 'fir')
+  results_mir, dataset = output_result(opt, 'mir')
+  results_nir, dataset = output_result(opt, 'nir')
+  save_result(results_rgb, results_fir, results_mir, results_nir)
 
   # output_sing_mAP()
   # output_fusion_mAP()
   # output_fusion_mAP_rgb_after()
-
-  # results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
-  # results = nms(results_rgb, results_fir, results_mir, results_nir)
-  # cal_mAP(results, dataset)
-  #
-  # results_rgb, results_fir, results_mir, results_nir, dataset = load_result()
-  # results = nms(results_nir, results_mir, results_fir)
-  # cal_mAP(results, dataset)
 
   sensor_combinations = get_all_sensor_combinations()
   results_rgb, results_fir, results_mir, results_nir, dataset = load_result()

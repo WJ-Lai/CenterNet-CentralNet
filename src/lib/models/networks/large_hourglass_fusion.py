@@ -505,16 +505,28 @@ class exkp(nn.Module):
 
         self.relu3 = nn.ReLU(inplace=True)
 
-        self.mergeup_pre = make_weight_merge_layer(2)
+        # self.mergeuplayer = make_merge_layer(1)
+        # self.mergeup_pre = make_merge_layer(1)
+        # self.mergeup_kp = nn.ModuleList([
+        #                     make_merge_layer(1) for _ in range(nstack)
+        #                     ])
+        # self.mergeup_head = nn.ModuleList([
+        #                     make_merge_layer(1) for _ in range(nstack)
+        #                     ])
+
+        self.mergeuplayer = make_weight_merge_layer()
+        self.mergeup_pre = make_weight_merge_layer()
         self.mergeup_kp = nn.ModuleList([
-                            make_weight_merge_layer(3) for _ in range(nstack)
+                            make_weight_merge_layer() for _ in range(nstack)
                             ])
         self.mergeup_head = nn.ModuleList([
-                            make_weight_merge_layer(3) for _ in range(nstack)
+                            make_weight_merge_layer() for _ in range(nstack)
                             ])
 
     def forward(self, image1, image2):
+        # print('image shape', image.shape)
 
+        # sensor1
         inter1 = self.pre1(image1)
         inter2 = self.pre2(image2)
         inter3 = self.mergeup_pre(inter1, inter2)
@@ -568,21 +580,21 @@ class exkp(nn.Module):
 
 
 class WeightMergeUp(nn.Module):
-    def __init__(self, num_input):
+    def __init__(self):
         super(WeightMergeUp, self).__init__()
-        self.alpha = [torch.nn.Parameter(torch.Tensor([1.]).cuda()) for i in range(num_input)]
+        self.alpha1 = torch.nn.Parameter(torch.Tensor([1.]).cuda())
+        self.alpha2 = torch.nn.Parameter(torch.Tensor([1.]).cuda())
+        self.alpha3 = torch.nn.Parameter(torch.Tensor([1.]).cuda())
 
     def forward(self, *up):
-
-        return sum([self.alpha[i]*up[i] for i in range(len(up))])
-        # if len(up)==2:
-        #     return self.alpha1 * up[0] + self.alpha2 * up[1]
-        # else:
-        #     return self.alpha1 * up[0] + self.alpha2 * up[1] + self.alpha3 * up[2]
+        if len(up)==2:
+            return self.alpha1 * up[0] + self.alpha2 * up[1]
+        else:
+            return self.alpha1 * up[0] + self.alpha2 * up[1] + self.alpha3 * up[2]
 
 
-def make_weight_merge_layer(num_input):
-    return WeightMergeUp(num_input)
+def make_weight_merge_layer():
+    return WeightMergeUp()
 
 
 def make_hg_layer(kernel, dim0, dim1, mod, layer=convolution, **kwargs):

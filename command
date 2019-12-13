@@ -9,3 +9,8 @@ python main_fusion.py --dataset mir,nir --exp_id mirnir --load_model /home/vince
 
 test:
 python test_fusion.py --dataset rgb,fir --load_model /home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/rgbfir/model_400.pth
+
+
+单传感器：
+测试：
+python test.py --arch hourglass --dataset rgb --load_model /home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/rgb/model_last.pth

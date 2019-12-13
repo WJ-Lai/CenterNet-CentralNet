@@ -98,7 +98,7 @@ class opts(object):
                              help='default: #samples / batch_size.')
     self.parser.add_argument('--val_intervals', type=int, default=5,
                              help='number of epochs to run validation.')
-    self.parser.add_argument('--trainval', action='store_true',
+    self.parser.add_argument('--trainval', default=True,#action='store_true',
                              help='include validation in training and '
                                   'test on test set')
 
@@ -111,7 +111,7 @@ class opts(object):
                              help='run nms in testing.')
     self.parser.add_argument('--K', type=int, default=100,
                              help='max number of output objects.') 
-    self.parser.add_argument('--not_prefetch_test', action='store_true',
+    self.parser.add_argument('--not_prefetch_test', default=True,#action='store_true',
                              help='not use parallal data pre-processing.')
     self.parser.add_argument('--fix_res', action='store_true',
                              help='fix testing resolution or keep '
@@ -239,7 +239,7 @@ class opts(object):
                              help='path of save exp data')
     self.parser.add_argument('--log_dir', default=None,
                              help='path of log data')
-    self.parser.add_argument('--test_dataset', default='test',
+    self.parser.add_argument('--test_dataset', default='val',
                              help='type of test dataset')
 
   def parse(self, args=''):

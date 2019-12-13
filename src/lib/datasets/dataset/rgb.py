@@ -109,6 +109,7 @@ class RGB(data.Dataset):
   
   def run_eval(self, results, save_dir):
     self.save_results(results, save_dir)
+    print('{}/results.json'.format(save_dir))
     coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
     coco_eval = COCOeval(self.coco, coco_dets, "bbox")
     coco_eval.evaluate()

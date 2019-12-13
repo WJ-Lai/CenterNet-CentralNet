@@ -82,7 +82,7 @@ def prefetch_test(opt):
 def test(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
 
-  Dataset = dataset_factory[opt.dataset]
+  Dataset = dataset_factory[opt.dataset[0]]
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
   print(opt)
   Logger(opt)
@@ -120,7 +120,9 @@ def test(opt):
 
 if __name__ == '__main__':
   opt = opts().parse()
-  if opt.not_prefetch_test:
-    test(opt)
-  else:
-    prefetch_test(opt)
+  dataset = 'rgb'
+  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_last.pth'
+  # if opt.not_prefetch_test:
+  test(opt)
+  # else:
+  #   prefetch_test(opt)

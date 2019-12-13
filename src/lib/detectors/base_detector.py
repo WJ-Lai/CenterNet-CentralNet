@@ -84,7 +84,6 @@ class BaseDetector(object):
   def run(self, *image_or_path_or_tensor, meta=None):
     if self.model._name == 'fusion':
       image_or_path_or_tensor2 = image_or_path_or_tensor[1]
-      print(image_or_path_or_tensor2)
       image_or_path_or_tensor = image_or_path_or_tensor[0]
     else:
       image_or_path_or_tensor = image_or_path_or_tensor[0]
