@@ -126,7 +126,7 @@ def load_result():
 def output_result(opt, dataset, model_type):
   assert model_type in [333,666,'best','last'], 'Model type must in [333,666,\'best\',\'last\']'
   opt.dataset = dataset
-  opt.load_model = '/home/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_'+str(model_type)+'.pth'
+  opt.load_model = '/media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_'+str(model_type)+'.pth'
   results, dataset = test(opt)
   return results, dataset
 

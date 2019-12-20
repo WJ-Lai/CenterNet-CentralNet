@@ -233,9 +233,9 @@ class opts(object):
     #                          help='path of data dir like: xxx/data')
     # self.parser.add_argument('--exp_dir', default='F:\LWJ\Checkpoint\CenterNet-CentralNet',
     #                          help='path to save exp data')
-    self.parser.add_argument('--data_dir', default='/home/vincent/Code/CenterNet-cuda10-multi-spectral/data',
+    self.parser.add_argument('--data_dir', default='/media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Code/CenterNet-cuda10-multi-spectral/data',
                              help='path of data dir like: xxx/data')
-    self.parser.add_argument('--exp_dir', default='/home/vincent/Checkpoint/CenterNet-CentralNet',
+    self.parser.add_argument('--exp_dir', default='/media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet',
                              help='path of save exp data')
     self.parser.add_argument('--log_dir', default=None,
                              help='path of log data')
