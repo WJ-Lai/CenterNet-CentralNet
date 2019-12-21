@@ -11,6 +11,7 @@
 9. large_hourglass_fusion_nms.py实现任意数量的传感器nms后融合
 10. mAP作为best model指标
 11. 在hourglassd第207行中加入dropout
+12. 在Adam中加入l2 norm(weight_decay=5e-4)
 
 test的时候要注意input size
 
