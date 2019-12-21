@@ -90,7 +90,7 @@ class opts(object):
                              help='drop learning rate by 10.')
     self.parser.add_argument('--num_epochs', type=int, default=500,
                              help='total training epochs.')
-    self.parser.add_argument('--batch_size', type=int, default=3,
+    self.parser.add_argument('--batch_size', type=int, default=8,
                              help='batch size')
     self.parser.add_argument('--master_batch_size', type=int, default=-1,
                              help='batch size on the master gpu.')
@@ -121,7 +121,7 @@ class opts(object):
                                   ' during validation.')
 
     # dataset
-    self.parser.add_argument('--not_rand_crop', action='store_true',
+    self.parser.add_argument('--not_rand_crop', default=True,#action='store_true',
                              help='not use the random crop data augmentation'
                                   'from CornerNet.')
     self.parser.add_argument('--shift', type=float, default=0.1,
@@ -299,7 +299,7 @@ class opts(object):
 
     opt.root_dir = os.path.join(os.path.dirname(__file__), '..', '..')
     opt.exp_dir = os.path.join(opt.exp_dir, opt.task)
-    opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)
+    opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id, opt.dataset[0])
     opt.debug_dir = os.path.join(opt.save_dir, 'debug')
     print('The output will be saved to ', opt.save_dir)
     

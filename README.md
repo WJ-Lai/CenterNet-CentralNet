@@ -10,8 +10,9 @@
 8. main_fusion_test_loader.py中为统一场景输入的融合loader的代码，但是没有结局的mead和std的问题(在opt)中，debug函数、detector类会用到
 9. large_hourglass_fusion_nms.py实现任意数量的传感器nms后融合
 10. mAP作为best model指标
-11. 在hourglassd第207行中加入dropout
+11. 在hourglassd第207行中加入dropout(不用此方法)
 12. 在Adam中加入l2 norm(weight_decay=5e-4)
+13. 考虑加入数据增强来增加数据量
 
 test的时候要注意input size
 

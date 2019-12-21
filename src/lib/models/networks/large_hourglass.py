@@ -193,10 +193,10 @@ class exkp(nn.Module):
         curr_dim = dims[0]
 
         self.pre = nn.Sequential(
-            convolution(7, 3, 128, stride=2),
-            residual(3, 128, 256, stride=2)
-            # convolution(7, 3, 64, stride=2),
-            # residual(3, 64, 128, stride=2)
+            # convolution(7, 3, 128, stride=2),
+            # residual(3, 128, 256, stride=2)
+            convolution(7, 3, 64, stride=2),
+            residual(3, 64, 128, stride=2)
         ) if pre is None else pre
 
         self.kps  = nn.ModuleList([
@@ -286,8 +286,8 @@ def make_hg_layer(kernel, dim0, dim1, mod, layer=convolution, **kwargs):
 class HourglassNet(exkp):
     def __init__(self, heads, num_stacks=2):
         n       = 5
-        dims    = [256, 256, 384, 384, 384, 512]
-        # dims = [128, 128, 192, 192, 192, 256]
+        # dims    = [256, 256, 384, 384, 384, 512]
+        dims = [128, 128, 192, 192, 192, 256]
         modules = [2, 2, 2, 2, 2, 4]
 
         super(HourglassNet, self).__init__(
