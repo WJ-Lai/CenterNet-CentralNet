@@ -280,6 +280,9 @@ class BaseTrainer(object):
     raise NotImplementedError
   
   def val(self, epoch, data_loader):
+    return self.run_epoch('val', epoch, data_loader)
+
+  def val_fusion(self, epoch, data_loader):
     return self.run_epoch_fusion('val', epoch, data_loader)
 
   def train(self, epoch, data_loader):

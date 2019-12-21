@@ -15,7 +15,7 @@ class opts(object):
     # basic experiment setting
     self.parser.add_argument('--task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet')
-    self.parser.add_argument('--dataset', default='rgb,fir,mir',
+    self.parser.add_argument('--dataset', default='rgb',
                              help='coco | kitti | coco_hp | pascal | voc | rgb | fir | mir | nir | fusion')
 
     self.parser.add_argument('--exp_id', default='default')
@@ -54,7 +54,7 @@ class opts(object):
                              help='not display time during training.')
     self.parser.add_argument('--save_all', action='store_true',
                              help='save model to disk every 5 epochs.')
-    self.parser.add_argument('--metric', default='loss', 
+    self.parser.add_argument('--metric', default='mAP',
                              help='main metric to save best model')
     self.parser.add_argument('--vis_thresh', type=float, default=0.3,
                              help='visualization threshold.')
@@ -86,11 +86,11 @@ class opts(object):
     # train
     self.parser.add_argument('--lr', type=float, default=2.5e-4,
                              help='learning rate for batch size 12.')
-    self.parser.add_argument('--lr_step', type=str, default='50,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,950,1000',
+    self.parser.add_argument('--lr_step', type=str, default='50,100,150,200,250,300,350,400,450,500',
                              help='drop learning rate by 10.')
-    self.parser.add_argument('--num_epochs', type=int, default=1000,
+    self.parser.add_argument('--num_epochs', type=int, default=500,
                              help='total training epochs.')
-    self.parser.add_argument('--batch_size', type=int, default=4,
+    self.parser.add_argument('--batch_size', type=int, default=2,
                              help='batch size')
     self.parser.add_argument('--master_batch_size', type=int, default=-1,
                              help='batch size on the master gpu.')
@@ -98,7 +98,7 @@ class opts(object):
                              help='default: #samples / batch_size.')
     self.parser.add_argument('--val_intervals', type=int, default=5,
                              help='number of epochs to run validation.')
-    self.parser.add_argument('--trainval', default=True,#action='store_true',
+    self.parser.add_argument('--trainval', action='store_true',
                              help='include validation in training and '
                                   'test on test set')
 
@@ -252,6 +252,9 @@ class opts(object):
     assert opt.dataset is not None, 'You must set the dataset param by "--dataset"'
     opt.dataset = [str(sensor) for sensor in opt.dataset.split(',')]
 
+    if opt.resume:
+      assert opt.log_dir is not None, 'log dir cannot be None'
+      assert opt.load_model is not None, 'load_model cannot be None'
 
     opt.gpus_str = opt.gpus
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]

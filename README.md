@@ -9,6 +9,8 @@
 7. test_nms中可查看单传感器与nms后融合结果,以及任意传感器组合
 8. main_fusion_test_loader.py中为统一场景输入的融合loader的代码，但是没有结局的mead和std的问题(在opt)中，debug函数、detector类会用到
 9. large_hourglass_fusion_nms.py实现任意数量的传感器nms后融合
+10. mAP作为best model指标
+11. 在hourglassd第207行中加入dropout
 
 test的时候要注意input size
 
@@ -32,5 +34,29 @@ fir+mir+nir:0.914
 
 rgb+fir+mir+nir:0.876
 
+单传感器：(用统一的exp_id,注意batch_size)
+初次训练必须输入的参数:main.py
+--dataset
+--arch
+--load_model 载入预训练模型
+必须关闭trainval
+例如：python main.py --dataset rgb --arch hourglass --load_model /media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Code/CenterNet-cuda10-multi-spectral/models/ctdet_coco_hg.pth
+
+继续训练必须输入的参数:main.py
+--dataset
+--arch
+--resume
+--log_dir
+必须关闭trainval
+例如：python main.py --dataset rgb --arch hourglass --resume --log_dir /media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet/ctdet/default/logs_2019-12-20-21-20
+
+
+测试必须输入的参数:test.py and test_nms.py
+--dataset
+--arch
+--load_model
+--test_dataset(默认为test)
+例如：
+python test.py --dataset rgb --arch hourglass --load_model /media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/rgb/model_last.pth
 
 

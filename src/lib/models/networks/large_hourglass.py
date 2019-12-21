@@ -193,6 +193,8 @@ class exkp(nn.Module):
         curr_dim = dims[0]
 
         self.pre = nn.Sequential(
+            # convolution(7, 3, 128, stride=2),
+            # residual(3, 128, 256, stride=2)
             convolution(7, 3, 64, stride=2),
             residual(3, 64, 128, stride=2)
         ) if pre is None else pre
@@ -249,6 +251,7 @@ class exkp(nn.Module):
 
 
         self.relu = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, image):
         # print('image shape', image.shape)
@@ -264,6 +267,7 @@ class exkp(nn.Module):
             for head in self.heads:
                 layer = self.__getattr__(head)[ind]
                 y = layer(cnv)
+                y = self.dropout(y)
                 out[head] = y
             
             outs.append(out)
