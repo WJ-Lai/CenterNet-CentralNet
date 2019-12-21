@@ -41,7 +41,7 @@ class RGB(data.Dataset):
       else:
         self.annot_path = os.path.join(
           self.data_dir, 'annotations', 
-          'test.json')
+          'train.json')
     self.max_objs = 100
     if len(cf.categories)==5:
       self.class_name = [
