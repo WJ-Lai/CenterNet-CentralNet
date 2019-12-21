@@ -241,6 +241,8 @@ class opts(object):
                              help='path of log data')
     self.parser.add_argument('--test_dataset', default='test',
                              help='type of test dataset')
+    self.parser.add_argument('--l2_norm', default=5e-4,
+                             help='Value of l2 normalization')
 
   def parse(self, args=''):
     if args == '':

@@ -38,9 +38,8 @@ rgb+fir+mir+nir:0.876
 初次训练必须输入的参数:main.py
 --dataset
 --arch
---load_model 载入预训练模型
 必须关闭trainval
-例如：python main.py --dataset rgb --arch hourglass --load_model /media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Code/CenterNet-cuda10-multi-spectral/models/ctdet_coco_hg.pth
+例如：python main.py --dataset rgb --arch hourglass
 
 继续训练必须输入的参数:main.py
 --dataset

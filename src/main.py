@@ -80,7 +80,7 @@ def main(opt):
   print("总参数数量和：" + str(k))
 
 
-  optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+  optimizer = torch.optim.Adam(model.parameters(), opt.lr, weight_decay=opt.l2_norm)
   start_epoch = 0
   if opt.load_model != '':
     model, optimizer, start_epoch = load_model(
@@ -114,10 +114,16 @@ def main(opt):
   )
 
   print('Starting training...')
-  if opt.metric == 'loss':
-    best = 1e10
+  if opt.load_model:
+      if opt.metric == 'loss':
+        best = 1e10
+      else:
+        best = test(opt, Dataset(opt, 'val'))
   else:
-    best = 0.0
+      if opt.metric == 'loss':
+        best = 1e10
+      else:
+        best = 0.0
 
 
   for epoch in range(start_epoch + 1, opt.num_epochs + 1):
@@ -135,9 +141,16 @@ def main(opt):
           log_dict_val, preds = trainer.val(epoch, val_loader)
         else:
           log_dict_val = {}
+          train_mAP = {}
           log_dict_val[opt.metric] = test(opt, Dataset(opt, 'val'))
+          train_mAP[opt.metric] = test(opt, Dataset(opt, 'train'))
+          print('Train mAP:{}'.format(train_mAP[opt.metric]))
+          print('Val mAP:{}'.format(log_dict_val[opt.metric]))
       for k, v in log_dict_val.items():
         logger.scalar_summary('val_{}'.format(k), v, epoch)
+        logger.write('{} {:8f} | '.format(k, v))
+      for k, v in train_mAP.items():
+        logger.scalar_summary('train_{}'.format(k), v, epoch)
         logger.write('{} {:8f} | '.format(k, v))
       if opt.metric=='loss':
           if log_dict_val[opt.metric] < best:
