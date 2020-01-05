@@ -126,7 +126,8 @@ def load_result():
 def output_result(opt, dataset, model_type):
   assert model_type in [333,666,'best','last'], 'Model type must in [333,666,\'best\',\'last\']'
   opt.dataset = dataset
-  opt.load_model = '/media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet/ctdet/single2/'+dataset+'/model_'+str(model_type)+'.pth'
+  # opt.load_model = 'F:/LWJ/Checkpoint/CenterNet-CentralNet/ctdet/'+opt.exp_id+'/'+dataset+'/model_'+str(model_type)+'.pth'
+  opt.load_model = '/media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet/ctdet/' + opt.exp_id + '/' + dataset + '/model_' + str(model_type) + '.pth'
   results, dataset = test(opt)
   return results, dataset
 
@@ -190,11 +191,11 @@ def output_all_results(model_type):
 
 
 if __name__ == '__main__':
-  sys.stdout = Logger_txt("results.txt")
   opt = opts().parse()
-  for opt.test_dataset in ['test', 'val']:
+  sys.stdout = Logger_txt(opt.exp_id+".txt")
+  for opt.test_dataset in ['train', 'val', 'test']:
     print(opt.test_dataset)
-    for model_type in [333,666,'best','last']:
+    for model_type in ['last','best']:
       output_all_results(model_type)
       print('')
       print('')

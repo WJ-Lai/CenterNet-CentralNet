@@ -36,6 +36,8 @@ class CTDetDataset(data.Dataset):
     num_objs = min(len(anns), self.max_objs)
 
     img = cv2.imread(img_path)
+    if self.opt.dataset[0] in ['fir','mir','nir']:
+      img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
     height, width = img.shape[0], img.shape[1]
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)

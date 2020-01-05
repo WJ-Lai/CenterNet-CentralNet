@@ -86,11 +86,11 @@ class opts(object):
     # train
     self.parser.add_argument('--lr', type=float, default=2.5e-4,
                              help='learning rate for batch size 12.')
-    self.parser.add_argument('--lr_step', type=str, default='50,100,150,200,250,300,350,400,450,500',
+    self.parser.add_argument('--lr_step', type=str, default='250',
                              help='drop learning rate by 10.')
     self.parser.add_argument('--num_epochs', type=int, default=500,
                              help='total training epochs.')
-    self.parser.add_argument('--batch_size', type=int, default=8,
+    self.parser.add_argument('--batch_size', type=int, default=4,
                              help='batch size')
     self.parser.add_argument('--master_batch_size', type=int, default=-1,
                              help='batch size on the master gpu.')
@@ -121,7 +121,7 @@ class opts(object):
                                   ' during validation.')
 
     # dataset
-    self.parser.add_argument('--not_rand_crop', default=True,#action='store_true',
+    self.parser.add_argument('--not_rand_crop', action='store_true',
                              help='not use the random crop data augmentation'
                                   'from CornerNet.')
     self.parser.add_argument('--shift', type=float, default=0.1,

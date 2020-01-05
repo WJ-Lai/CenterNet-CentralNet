@@ -13,28 +13,24 @@
 11. 在hourglassd第207行中加入dropout(不用此方法)
 12. 在Adam中加入l2 norm(weight_decay=5e-4)
 13. 考虑加入数据增强来增加数据量
+14. data_tool.py生成数据
+15. 数据集加上白天，2999张，五类
+{'bike': 889, 'car': 1035, 'car_stop': 1538, 'color_cone': 987, 'person': 3722}
+{'bike': 586, 'car': 1227, 'car_stop': 1259, 'color_cone': 692, 'person': 2069}
+# rgb
+rgb_mean = [0.181065, 0.171860, 0.175805]
+rgb_std = [0.275618, 0.261550, 0.266921]
+# fir
+fir_mean = [0.168333, 0.168333, 0.168333]
+fir_std = [0.202114, 0.202114, 0.202114]
+# mir
+mir_mean = [0.147748, 0.147748, 0.147748]
+mir_std = [0.183103, 0.183103, 0.183103]
+# nir
+nir_mean = [0.187101, 0.187101, 0.187101]
+nir_std = [0.271039, 0.271039, 0.271039]
 
 test的时候要注意input size
-
-测试集-last model mAP：
-rgb:0.476
-fir:0.793
-mir:0.782
-nir:0.706
-
-rgb+fir:0.819
-rgb+mir:0.773
-fgb+nir:0.733
-fir+mir:0.877
-fir+nir:0.882
-mir+nir:0.894
-
-rgb+fir+mir:0.864
-rgb+fir+nir:0.879
-rgb+mir+nir:0.865
-fir+mir+nir:0.914
-
-rgb+fir+mir+nir:0.876
 
 单传感器：(用统一的exp_id,注意batch_size)
 初次训练必须输入的参数:main.py

@@ -20,7 +20,7 @@ from detectors.detector_factory import detector_factory
 from utils.utils import AverageMeter
 
 def test(opt, dataset):
-    opt.load_model = os.path.join(opt.exp_dir, opt.exp_id, 'model_last.pth')
+    opt.load_model = os.path.join(opt.save_dir, 'model_last.pth')
     Detector = detector_factory[opt.task]
     detector = Detector(opt)
 
@@ -80,7 +80,9 @@ def main(opt):
   print("总参数数量和：" + str(k))
 
 
-  optimizer = torch.optim.Adam(model.parameters(), opt.lr, weight_decay=opt.l2_norm)
+  # optimizer = torch.optim.Adam(model.parameters(), opt.lr, weight_decay=opt.l2_norm)
+  optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+
   start_epoch = 0
   if opt.load_model != '':
     model, optimizer, start_epoch = load_model(
