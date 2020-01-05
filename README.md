@@ -47,6 +47,7 @@ test的时候要注意input size
 必须关闭trainval
 例如：python main.py --dataset rgb --arch hourglass --resume --log_dir /media/vincent/856c2c04-3976-4948-ba47-5539ecaa24be/vincent/Checkpoint/CenterNet-CentralNet/ctdet/default/logs_2019-12-20-21-20
 
+ python main.py --dataset rgb --batch_size 8 --arch dlav0_34 --no_color_aug
 
 测试必须输入的参数:test.py and test_nms.py
 --dataset

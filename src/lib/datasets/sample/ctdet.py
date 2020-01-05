@@ -35,9 +35,13 @@ class CTDetDataset(data.Dataset):
     anns = self.coco.loadAnns(ids=ann_ids)
     num_objs = min(len(anns), self.max_objs)
 
-    img = cv2.imread(img_path)
     if self.opt.dataset[0] in ['fir','mir','nir']:
-      img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+      img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+      img = np.expand_dims(img, axis=2)
+    else:
+      img = cv2.imread(img_path)
+    # cv2.imshow('f', img)
+    # cv2.waitKey(0)
 
     height, width = img.shape[0], img.shape[1]
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)
@@ -75,6 +79,10 @@ class CTDetDataset(data.Dataset):
     inp = cv2.warpAffine(img, trans_input, 
                          (input_w, input_h),
                          flags=cv2.INTER_LINEAR)
+
+    if self.opt.dataset[0] in ['fir','mir','nir']:
+      inp = np.expand_dims(inp, axis=2)
+
     inp = (inp.astype(np.float32) / 255.)
     if self.split == 'train' and not self.opt.no_color_aug:
       color_aug(self._data_rng, inp, self._eig_val, self._eig_vec)

@@ -183,4 +183,5 @@ if __name__ == '__main__':
   opt = opts().parse()
   # opt.dataset = 'rgb'
   # opt.arch = 'hourglass'
+  opt.no_color_aug = True
   main(opt)
